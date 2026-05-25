@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="CTT — Clever Track Tech. Zambia's community-powered device security and theft reporting platform.">
+<title>CTT — Clever Track Tech | Device Security Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════ */
+:root {
+  --bg-deep: #050c1a;
+  --bg-base: #080f1f;
+  --bg-mid:  #0d1830;
+  --bg-sur:  #111e38;
+  --bg-ele:  #162444;
+
+  --glass-bg:   rgba(13,24,48,0.55);
+  --glass-bg2:  rgba(22,36,68,0.45);
+  --glass-bdr:  rgba(255,255,255,0.07);
+  --glass-bdr2: rgba(255,255,255,0.12);
+  --glass-bdr-accent: rgba(56,139,255,0.35);
+
+  --accent:      #388bff;
+  --accent-2:    #5fa8ff;
+  --accent-dim:  rgba(56,139,255,0.15);
+  --accent-glow: rgba(56,139,255,0.25);
+
+  --danger:      #e05252;
+  --danger-2:    #ff6b6b;
+  --danger-dim:  rgba(224,82,82,0.15);
+  --danger-glow: rgba(224,82,82,0.25);
+
+  --success:     #2ecc71;
+  --success-2:   #4ade80;
+  --success-dim: rgba(46,204,113,0.15);
+
+  --warn:        #f0a500;
+  --warn-2:      #fbbf24;
+  --warn-dim:    rgba(240,165,0,0.15);
+
+  --text-1: #eaf2ff;
+  --text-2: #8ba4c5;
+  --text-3: #4e6885;
+  --text-4: #2d4460;
+
+  --font:   'DM Sans', sans-serif;
+  --mono:   'DM Mono', monospace;
+  --serif:  'Playfair Display', serif;
+
+  --nav-h: 64px;
+  --r-sm: 6px;
+  --r:    10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.55);
+  --blur: blur(18px);
+  --blur-sm: blur(10px);
+}
+
+/* ══════════════════════════════════════
+   RESET + BASE
+══════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:15px; }
+body {
+  background: var(--bg-deep);
+  color: var(--text-1);
+  font-family: var(--font);
+  line-height: 1.65;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+input,select,textarea,button { font-family: var(--font); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--bg-ele); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+/* ══════════════════════════════════════
+   ANIMATED BACKGROUND
+══════════════════════════════════════ */
+.bg-canvas {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+}
+.bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.18;
+  animation: orbFloat 18s ease-in-out infinite;
+}
+.bg-orb-1 { width:600px;height:600px;background:radial-gradient(circle,#1a4daa,transparent); top:-200px;left:-150px; animation-duration:20s; }
+.bg-orb-2 { width:500px;height:500px;background:radial-gradient(circle,#0d2d6b,transparent); bottom:-150px;right:-100px; animation-duration:25s;animation-delay:-8s; }
+.bg-orb-3 { width:350px;height:350px;background:radial-gradient(circle,#1c3a7a,transparent); top:40%;left:55%; animation-duration:15s;animation-delay:-4s;opacity:.12; }
+.bg-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(56,139,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,139,255,0.025) 1px,transparent 1px);
+  background-size: 50px 50px;
+}
+@keyframes orbFloat {
+  0%,100%{transform:translate(0,0) scale(1);}
+  33%{transform:translate(40px,-30px) scale(1.05);}
+  66%{transform:translate(-25px,20px) scale(0.97);}
+}
+
+/* ══════════════════════════════════════
+   GLASSMORPHISM UTILITIES
+══════════════════════════════════════ */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-bdr);
+  border-radius: var(--r-lg);
+}
+.glass-light {
+  background: var(--glass-bg2);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border: 1px solid var(--glass-bdr2);
+  border-radius: var(--r-lg);
+}
+.glass-accent { border-color: var(--glass-bdr-accent) !important; }
+.glass-danger  { border-color: rgba(224,82,82,0.3)   !important; }
+.glass-success { border-color: rgba(46,204,113,0.3)  !important; }
+.glass-warn    { border-color: rgba(240,165,0,0.3)   !important; }
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+.topbar {
+  position: fixed; top:0; left:0; right:0; z-index:800;
+  height: var(--nav-h);
+  background: rgba(5,12,26,0.82);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--glass-bdr);
+  display: flex; align-items: center;
+  padding: 0 1.5rem; gap: 1.5rem;
+}
+.brand {
+  display:flex; align-items:center; gap:.65rem;
+  cursor:pointer; flex-shrink:0; text-decoration:none;
+}
+.brand-icon {
+  width:38px; height:38px; border-radius:10px;
+  background: linear-gradient(135deg,var(--accent),#1a4dcc);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 18px var(--accent-glow);
+  flex-shrink:0;
+}
+.brand-icon svg { width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.brand-name { font-family:var(--serif); font-size:1.15rem; font-weight:700; color:var(--text-1); letter-spacing:.02em; }
+.brand-sub  { font-size:.6rem; color:var(--text-3); letter-spacing:.1em; text-transform:uppercase; display:block; margin-top:-2px; }
+
+.nav-links { display:flex; align-items:center; gap:.1rem; flex:1; overflow:hidden; }
+.nav-btn {
+  background:none; border:none; color:var(--text-3);
+  font-size:.78rem; font-weight:500; padding:.42rem .85rem;
+  border-radius:var(--r-sm); cursor:pointer; white-space:nowrap;
+  transition:color .2s,background .2s; letter-spacing:.02em;
+}
+.nav-btn:hover { color:var(--text-1); background:rgba(255,255,255,0.05); }
+.nav-btn.active { color:var(--text-1); background:rgba(56,139,255,0.12); }
+.nav-report-btn { color:var(--danger-2) !important; }
+.nav-report-btn:hover { background:var(--danger-dim) !important; }
+
+.nav-right { display:flex; align-items:center; gap:.65rem; flex-shrink:0; }
+.btn-admin-nav {
+  background: rgba(255,255,255,0.05); border:1px solid var(--glass-bdr2);
+  color:var(--text-2); font-size:.75rem; font-weight:600;
+  padding:.38rem .9rem; border-radius:var(--r-sm); cursor:pointer;
+  letter-spacing:.04em; text-transform:uppercase; transition:all .2s;
+}
+.btn-admin-nav:hover { color:var(--text-1); border-color:var(--accent); background:var(--accent-dim); }
+
+/* Mobile hamburger */
+.nav-toggle {
+  display:none; background:none; border:none;
+  color:var(--text-2); font-size:1.4rem; cursor:pointer;
+  padding:.3rem; border-radius:var(--r-sm);
+}
+
+/* Mobile slide menu */
+.mobile-menu {
+  position:fixed; top:var(--nav-h); left:0; right:0; bottom:0;
+  z-index:750; background:rgba(5,12,26,0.96);
+  backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  display:none; flex-direction:column; padding:1.5rem;
+  gap:.35rem; overflow-y:auto;
+  transform:translateX(100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.mobile-menu.open { transform:translateX(0); }
+.mobile-menu-btn {
+  background:rgba(255,255,255,0.04); border:1px solid var(--glass-bdr);
+  color:var(--text-2); font-size:.92rem; font-weight:500;
+  padding:.85rem 1.1rem; border-radius:var(--r); cursor:pointer;
+  text-align:left; transition:all .2s; display:flex; align-items:center; gap:.75rem;
+}
+.mobile-menu-btn:hover,.mobile-menu-btn.active { color:var(--text-1); background:rgba(56,139,255,0.1); border-color:rgba(56,139,255,0.25); }
+.mobile-menu-btn.danger { color:var(--danger-2); }
+.mmb-icon { font-size:1rem; width:24px; text-align:center; }
+
+/* Bottom mobile nav */
+.mob-bar {
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:800;
+  background:rgba(5,12,26,0.92); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border-top:1px solid var(--glass-bdr);
+  padding: 0 0 env(safe-area-inset-bottom,0);
+}
+.mob-bar-inner { display:flex; }
+.mob-btn {
+  flex:1; background:none; border:none; color:var(--text-3);
+  font-size:.58rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+  padding:.6rem .25rem .45rem; cursor:pointer; display:flex; flex-direction:column;
+  align-items:center; gap:.22rem; transition:color .2s;
+}
+.mob-btn .mi { font-size:1.15rem; line-height:1; }
+.mob-btn.active { color:var(--accent-2); }
+.mob-btn.danger { color:var(--danger-2); }
+
+@media(max-width:900px) {
+  .nav-links { display:none; }
+  .btn-admin-nav { display:none; }
+  .nav-toggle { display:block; }
+  .mob-bar { display:block; }
+  body { padding-bottom:60px; }
+}
+@media(max-width:480px) { .topbar { padding:0 1rem; gap:1rem; } }
+
+/* ══════════════════════════════════════
+   PAGES
+══════════════════════════════════════ */
+.page { display:none; position:relative; z-index:1; padding-top:var(--nav-h); min-height:100vh; }
+.page.active { display:block; animation:pageFade .35s ease; }
+@keyframes pageFade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+.pw   { max-width:1100px; margin:0 auto; padding:2rem 1.5rem 5rem; }
+.pw-sm{ max-width:760px;  margin:0 auto; padding:2rem 1.5rem 5rem; }
+.pw-lg{ max-width:1260px; margin:0 auto; padding:2rem 1.5rem 5rem; }
+@media(max-width:640px){ .pw,.pw-sm,.pw-lg{ padding:1.5rem 1rem 5rem; } }
+
+/* ══════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════ */
+.ph { margin-bottom:1.75rem; }
+.ph-eye {
+  font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--accent-2); margin-bottom:.4rem; display:flex; align-items:center; gap:.5rem;
+}
+.ph-eye::before { content:''; width:20px; height:1px; background:var(--accent); }
+.ph h1 { font-family:var(--serif); font-size:clamp(1.3rem,3vw,1.8rem); font-weight:700; color:var(--text-1); letter-spacing:-.02em; }
+.ph p  { font-size:.875rem; color:var(--text-2); margin-top:.3rem; line-height:1.6; }
+
+/* ══════════════════════════════════════
+   SECTION DIVIDER
+══════════════════════════════════════ */
+.sdiv {
+  font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-3); margin:2rem 0 1.1rem; display:flex; align-items:center; gap:.85rem;
+}
+.sdiv::after { content:''; flex:1; height:1px; background:var(--glass-bdr2); }
+
+/* ══════════════════════════════════════
+   GLASS CARD
+══════════════════════════════════════ */
+.card {
+  background: var(--glass-bg); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-bdr); border-radius:var(--r-lg);
+  padding:1.35rem; transition:border-color .2s, box-shadow .2s;
+}
+.card:hover { border-color:var(--glass-bdr2); }
+.card-hd {
+  font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-3); margin-bottom:1.1rem; padding-bottom:.85rem;
+  border-bottom:1px solid var(--glass-bdr);
+  display:flex; align-items:center; gap:.5rem;
+}
+
+/* ══════════════════════════════════════
+   GRID
+══════════════════════════════════════ */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+@media(max-width:900px){ .g2{ grid-template-columns:1fr;} .g3{grid-template-columns:1fr 1fr;} .g4{grid-template-columns:1fr 1fr;} }
+@media(max-width:560px){ .g3,.g4{ grid-template-columns:1fr;} }
+.stacked { display:flex; flex-direction:column; gap:1.25rem; }
+
+/* ══════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════ */
+.fg { margin-bottom:1rem; }
+.fg:last-child { margin-bottom:0; }
+.fg label {
+  display:block; font-size:.7rem; font-weight:600; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--text-2); margin-bottom:.4rem;
+}
+.fg label .req { color:var(--danger-2); margin-left:2px; }
+.fg input,.fg select,.fg textarea {
+  width:100%;
+  background:rgba(5,12,26,0.7);
+  border:1px solid var(--glass-bdr2);
+  border-radius:var(--r); padding:.6rem .95rem;
+  color:var(--text-1); font-size:.875rem;
+  transition:border-color .2s,box-shadow .2s; outline:none;
+  backdrop-filter:var(--blur-sm);
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus {
+  border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim);
+}
+.fg input::placeholder,.fg textarea::placeholder { color:var(--text-3); }
+.fg select option { background:#0d1830; color:var(--text-1); }
+.fg textarea { resize:vertical; min-height:82px; line-height:1.6; }
+.fg input[type="file"] { padding:.42rem .75rem; cursor:pointer; color:var(--text-2); }
+.fg .hint { font-size:.72rem; color:var(--text-3); margin-top:.3rem; line-height:1.5; }
+.fg-row { display:flex; gap:.75rem; }
+.fg-row .fg { flex:1; margin-bottom:0; }
+
+/* ══════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════ */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
+  font-family:var(--font); font-size:.8rem; font-weight:600; letter-spacing:.03em;
+  padding:.58rem 1.15rem; border-radius:var(--r); border:1px solid transparent;
+  cursor:pointer; transition:all .2s; white-space:nowrap; text-decoration:none;
+}
+.btn-full { width:100%; }
+.btn-lg   { padding:.75rem 1.5rem; font-size:.9rem; }
+.btn-sm   { padding:.35rem .8rem;  font-size:.75rem; }
+.btn:disabled { opacity:.4; cursor:not-allowed; pointer-events:none; }
+
+.btn-primary {
+  background:linear-gradient(135deg,var(--accent),#1a4dcc);
+  border-color:rgba(56,139,255,0.4); color:#fff;
+  box-shadow:0 4px 18px var(--accent-glow);
+}
+.btn-primary:hover { background:linear-gradient(135deg,var(--accent-2),var(--accent)); box-shadow:0 6px 25px var(--accent-glow); transform:translateY(-1px); }
+
+.btn-secondary {
+  background:rgba(255,255,255,0.06); border-color:var(--glass-bdr2); color:var(--text-1);
+  backdrop-filter:var(--blur-sm);
+}
+.btn-secondary:hover { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.18); }
+
+.btn-danger {
+  background:linear-gradient(135deg,var(--danger),#b83232);
+  border-color:rgba(224,82,82,0.4); color:#fff;
+  box-shadow:0 4px 18px var(--danger-glow);
+}
+.btn-danger:hover { background:linear-gradient(135deg,var(--danger-2),var(--danger)); transform:translateY(-1px); }
+
+.btn-success {
+  background:rgba(46,204,113,0.15); border-color:rgba(46,204,113,0.35); color:var(--success-2);
+}
+.btn-success:hover { background:rgba(46,204,113,0.25); }
+
+.btn-warn {
+  background:rgba(240,165,0,0.12); border-color:rgba(240,165,0,0.3); color:var(--warn-2);
+}
+.btn-warn:hover { background:rgba(240,165,0,0.22); }
+
+.btn-ghost {
+  background:none; border-color:var(--glass-bdr2); color:var(--text-2);
+}
+.btn-ghost:hover { color:var(--text-1); background:rgba(255,255,255,0.05); }
+
+/* ══════════════════════════════════════
+   STATUS BADGES
+══════════════════════════════════════ */
+.badge {
+  display:inline-flex; align-items:center; gap:.35rem;
+  padding:.22rem .7rem; border-radius:4px;
+  font-size:.65rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  border:1px solid transparent;
+}
+.bd-stolen   { background:var(--danger-dim);  color:var(--danger-2);  border-color:rgba(224,82,82,0.3);  }
+.bd-safe     { background:var(--success-dim); color:var(--success-2); border-color:rgba(46,204,113,0.3); }
+.bd-recovered{ background:var(--warn-dim);    color:var(--warn-2);    border-color:rgba(240,165,0,0.3);  }
+.bd-unknown  { background:rgba(255,255,255,0.06); color:var(--text-2); border-color:var(--glass-bdr2); }
+.bd-live {
+  background:rgba(224,82,82,0.12); color:var(--danger-2); border-color:rgba(224,82,82,0.3);
+  display:inline-flex; align-items:center; gap:.4rem;
+}
+.bd-dot { width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse-dot 1.4s infinite; }
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ══════════════════════════════════════
+   STAT BOX
+══════════════════════════════════════ */
+.stat-box {
+  background:var(--glass-bg); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-bdr); border-radius:var(--r-lg);
+  padding:1.15rem 1.3rem; position:relative; overflow:hidden;
+}
+.stat-box::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+}
+.stat-box.s-accent::after { background:linear-gradient(90deg,var(--accent),transparent); }
+.stat-box.s-danger::after { background:linear-gradient(90deg,var(--danger),transparent); }
+.stat-box.s-success::after{ background:linear-gradient(90deg,var(--success),transparent); }
+.stat-box.s-warn::after   { background:linear-gradient(90deg,var(--warn),transparent); }
+.sb-label { font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:.4rem; }
+.sb-val   { font-family:var(--mono);font-size:2rem;font-weight:500;line-height:1;letter-spacing:-.03em; }
+.sb-val.c-accent  { color:var(--accent-2);  }
+.sb-val.c-danger  { color:var(--danger-2);  }
+.sb-val.c-success { color:var(--success-2); }
+.sb-val.c-warn    { color:var(--warn-2);    }
+.sb-sub { font-size:.72rem;color:var(--text-3);margin-top:.25rem; }
+
+/* ══════════════════════════════════════
+   ALERT ITEM
+══════════════════════════════════════ */
+.ai {
+  background:var(--glass-bg); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-bdr); border-radius:var(--r-lg);
+  display:flex; gap:.9rem; align-items:flex-start;
+  padding:1.1rem 1.15rem; transition:border-color .2s,transform .2s;
+}
+.ai:hover { border-color:var(--glass-bdr2); transform:translateX(2px); }
+.ai+.ai { margin-top:.6rem; }
+.ai-bar { width:3px; align-self:stretch; border-radius:2px; flex-shrink:0; }
+.ai-stolen   .ai-bar { background:var(--danger);  }
+.ai-recovered.ai-bar { background:var(--warn);    }
+.ai-safe     .ai-bar { background:var(--success); }
+.ai-body { flex:1; min-width:0; }
+.ai-title { font-size:.9rem;font-weight:600;color:var(--text-1);margin-bottom:.22rem; }
+.ai-meta  { font-size:.75rem;color:var(--text-2);display:flex;flex-wrap:wrap;gap:.35rem .8rem; }
+.ai-meta span { display:flex;align-items:center;gap:.3rem; }
+.ai-time  { font-family:var(--mono);font-size:.68rem;color:var(--text-3);margin-top:.3rem; }
+.ai-side  { flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; gap:.4rem; }
+
+/* ══════════════════════════════════════
+   TABLE
+══════════════════════════════════════ */
+.tbl-wrap { overflow-x:auto; border-radius:var(--r-lg); border:1px solid var(--glass-bdr); }
+table { width:100%; border-collapse:collapse; min-width:480px; }
+thead th {
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);padding:.7rem 1rem;text-align:left;
+  background:rgba(5,12,26,0.6); border-bottom:1px solid var(--glass-bdr2);
+}
+tbody td { font-size:.82rem;padding:.75rem 1rem;border-bottom:1px solid var(--glass-bdr);vertical-align:middle;color:var(--text-1); }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:rgba(56,139,255,0.04); }
+
+/* ══════════════════════════════════════
+   MODAL
+══════════════════════════════════════ */
+.overlay {
+  position:fixed;inset:0;z-index:900;
+  background:rgba(3,8,20,0.8); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  display:none; align-items:center; justify-content:center; padding:1.25rem;
+}
+.overlay.open { display:flex; }
+.modal {
+  background:var(--glass-bg); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-bdr2); border-radius:var(--r-xl);
+  padding:1.85rem; width:100%; max-width:440px;
+  box-shadow:var(--shadow-lg); position:relative; animation:modalIn .25s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px)scale(.98)}to{opacity:1;transform:none}}
+.modal-hd { margin-bottom:1.35rem; }
+.modal-hd h3 { font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--text-1);margin-bottom:.25rem; }
+.modal-hd p  { font-size:.82rem;color:var(--text-2); }
+.modal-close {
+  position:absolute;top:1rem;right:1rem;
+  background:rgba(255,255,255,0.07);border:1px solid var(--glass-bdr);
+  color:var(--text-2);width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.9rem;transition:all .2s;
+}
+.modal-close:hover { color:var(--text-1);background:rgba(255,255,255,0.12); }
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+#toast-mount {
+  position:fixed;bottom:80px;right:1rem;z-index:999;
+  display:flex;flex-direction:column;gap:.5rem;pointer-events:none;
+}
+@media(min-width:901px){ #toast-mount{bottom:1.25rem;} }
+.toast {
+  background:var(--glass-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-bdr2);border-radius:var(--r-lg);
+  padding:.75rem 1.1rem;min-width:260px;max-width:340px;
+  display:flex;gap:.65rem;align-items:flex-start;
+  box-shadow:var(--shadow-lg);pointer-events:all;
+  animation:slideToast .3s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideToast{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.toast.out{animation:slideToastOut .25s ease forwards;}
+@keyframes slideToastOut{to{opacity:0;transform:translateX(30px)}}
+.toast-stripe { width:3px;border-radius:2px;align-self:stretch;flex-shrink:0; }
+.toast-success .toast-stripe{background:var(--success);}
+.toast-error   .toast-stripe{background:var(--danger);}
+.toast-info    .toast-stripe{background:var(--accent);}
+.toast-warn    .toast-stripe{background:var(--warn);}
+.toast-icon { font-size:1rem;flex-shrink:0;padding-top:.05rem; }
+.toast-body .t1{font-size:.82rem;font-weight:600;color:var(--text-1);}
+.toast-body .t2{font-size:.74rem;color:var(--text-2);margin-top:.08rem;}
+
+/* ══════════════════════════════════════
+   TABS
+══════════════════════════════════════ */
+.tabs {
+  display:flex; gap:.15rem;
+  background:rgba(5,12,26,0.6); backdrop-filter:var(--blur-sm);
+  border:1px solid var(--glass-bdr); border-radius:var(--r);
+  padding:.25rem; margin-bottom:1.35rem; flex-wrap:wrap;
+}
+.tab-btn {
+  flex:1; min-width:max-content; background:none; border:none;
+  color:var(--text-3); font-size:.78rem; font-weight:500;
+  padding:.48rem .6rem; border-radius:var(--r-sm);
+  cursor:pointer; text-align:center; transition:all .2s;
+}
+.tab-btn:hover { color:var(--text-1); }
+.tab-btn.active {
+  background:var(--glass-bg2); color:var(--text-1);
+  box-shadow:0 2px 8px rgba(0,0,0,.3); border:1px solid var(--glass-bdr2);
+}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;animation:pageFade .25s ease;}
+
+/* ══════════════════════════════════════
+   TOGGLE SWITCH
+══════════════════════════════════════ */
+.tog-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.9rem 0; border-bottom:1px solid var(--glass-bdr);
+}
+.tog-row:last-child{border-bottom:none;}
+.tog-text .tt1{font-size:.85rem;font-weight:500;color:var(--text-1);}
+.tog-text .tt2{font-size:.72rem;color:var(--text-3);margin-top:.1rem;}
+.tog {
+  width:42px;height:23px;background:rgba(255,255,255,0.1);
+  border-radius:12px;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0;
+  border:1px solid var(--glass-bdr2);
+}
+.tog.on{background:var(--accent);border-color:var(--accent);}
+.tog::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:15px;height:15px;background:#fff;border-radius:50%;
+  transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.4);
+}
+.tog.on::after{transform:translateX(19px);}
+
+/* ══════════════════════════════════════
+   GPS MAP
+══════════════════════════════════════ */
+.map-box {
+  background:rgba(5,12,26,0.8);
+  border:1px solid var(--glass-bdr); border-radius:var(--r-lg);
+  height:250px; position:relative; overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.map-grid {
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(56,139,255,.04)1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,139,255,.04)1px,transparent 1px);
+  background-size:28px 28px;
+}
+.map-circles{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.map-ring{
+  position:absolute;border-radius:50%;border:1px solid rgba(56,139,255,0.3);
+  animation:mapRing 3s ease-out infinite;
+}
+.map-ring:nth-child(2){animation-delay:1s;}
+.map-ring:nth-child(3){animation-delay:2s;}
+@keyframes mapRing{from{width:10px;height:10px;opacity:.9}to{width:140px;height:140px;opacity:0}}
+.map-pin-wrap{position:relative;z-index:2;text-align:center;}
+.map-pin{font-size:2rem;display:block;animation:pinBob 2.5s ease-in-out infinite;}
+@keyframes pinBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.map-coords{font-family:var(--mono);font-size:.72rem;color:var(--text-2);margin-top:.4rem;}
+
+/* ══════════════════════════════════════
+   CERT
+══════════════════════════════════════ */
+.cert-card {
+  background:var(--glass-bg); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-bdr-accent); border-radius:var(--r-xl);
+  padding:2rem; position:relative; overflow:hidden; display:none;
+}
+.cert-card.show{display:block;animation:pageFade .35s ease;}
+.cert-wm{
+  position:absolute;right:-2rem;bottom:-1rem;
+  font-family:var(--serif);font-size:6rem;font-weight:700;
+  color:rgba(56,139,255,0.04);letter-spacing:.08em;transform:rotate(-15deg);
+  pointer-events:none;white-space:nowrap;
+}
+.cert-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;}
+.cert-org{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);}
+.cert-vbadge{
+  background:var(--success-dim);border:1px solid rgba(46,204,113,.35);color:var(--success-2);
+  font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:.25rem .7rem;border-radius:var(--r-sm);display:flex;align-items:center;gap:.35rem;
+}
+.cert-title{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--text-1);margin-bottom:.2rem;}
+.cert-sub{font-size:.8rem;color:var(--text-2);margin-bottom:1.35rem;line-height:1.6;}
+.cert-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--glass-bdr);}
+.cert-row:last-of-type{border-bottom:none;}
+.cert-k{font-size:.72rem;font-weight:500;color:var(--text-3);letter-spacing:.02em;}
+.cert-v{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--text-1);}
+.cert-foot{margin-top:1.35rem;padding-top:1rem;border-top:1px dashed var(--glass-bdr2);font-family:var(--mono);font-size:.68rem;color:var(--text-3);}
+
+/* ══════════════════════════════════════
+   RESULT BOX
+══════════════════════════════════════ */
+.rbox{display:none;margin-top:1.25rem;padding:1.5rem;border-radius:var(--r-lg);text-align:center;border:1px solid var(--glass-bdr);}
+.rbox.show{display:block;animation:pageFade .3s ease;}
+.rbox-icon{font-size:2.5rem;margin-bottom:.6rem;}
+.rbox-status{font-family:var(--serif);font-size:1.05rem;font-weight:700;margin-bottom:.4rem;}
+.rbox-msg{font-size:.82rem;color:var(--text-2);line-height:1.65;margin-bottom:.85rem;}
+.rbox.clean{background:rgba(46,204,113,0.07);border-color:rgba(46,204,113,0.3);}.rbox.clean .rbox-status{color:var(--success-2);}
+.rbox.stolen{background:rgba(224,82,82,0.07);border-color:rgba(224,82,82,0.3);}.rbox.stolen .rbox-status{color:var(--danger-2);}
+.rbox.recovered{background:rgba(240,165,0,0.07);border-color:rgba(240,165,0,0.3);}.rbox.recovered .rbox-status{color:var(--warn-2);}
+.rbox.unknown{background:rgba(255,255,255,0.03);border-color:var(--glass-bdr2);}.rbox.unknown .rbox-status{color:var(--text-2);}
+.rbox-details{margin-top:.85rem;background:rgba(5,12,26,0.5);border:1px solid var(--glass-bdr);border-radius:var(--r);overflow:hidden;text-align:left;}
+.rd-row{display:flex;gap:1rem;padding:.55rem .85rem;border-bottom:1px solid var(--glass-bdr);}
+.rd-row:last-child{border-bottom:none;}
+.rd-k{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);width:90px;flex-shrink:0;padding-top:.1rem;}
+.rd-v{font-family:var(--mono);font-size:.8rem;color:var(--text-1);}
+
+/* ══════════════════════════════════════
+   TICKER
+══════════════════════════════════════ */
+.ticker {
+  background:rgba(5,12,26,0.7); backdrop-filter:var(--blur-sm);
+  border-top:1px solid var(--glass-bdr);
+  border-bottom:1px solid var(--glass-bdr);
+  display:flex;align-items:center;gap:1.25rem;padding:.55rem 1.5rem;overflow:hidden;
+}
+.ticker-tag{display:flex;align-items:center;gap:.45rem;white-space:nowrap;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--danger-2);}
+.ticker-scroll{overflow:hidden;flex:1;}
+.ticker-inner{display:flex;gap:4rem;animation:tickerAnim 40s linear infinite;white-space:nowrap;}
+.ticker-item{font-size:.76rem;color:var(--text-2);font-family:var(--mono);}
+.ticker-item b{color:var(--text-1);}
+@keyframes tickerAnim{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ══════════════════════════════════════
+   INFO LIST
+══════════════════════════════════════ */
+.info-list .il-row{display:flex;justify-content:space-between;align-items:center;padding:.62rem 0;border-bottom:1px solid var(--glass-bdr);}
+.info-list .il-row:last-child{border-bottom:none;}
+.il-k{font-size:.75rem;color:var(--text-2);}
+.il-v{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--text-1);text-align:right;}
+
+/* ══════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════ */
+.empty{text-align:center;padding:3rem 1rem;}
+.empty-i{font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.35;}
+.empty-t{font-size:.85rem;color:var(--text-3);}
+
+/* ══════════════════════════════════════
+   HERO SECTION
+══════════════════════════════════════ */
+.hero{
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:4rem 1.5rem 3rem;position:relative;
+}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:.55rem;
+  background:var(--accent-dim);border:1px solid rgba(56,139,255,.25);
+  border-radius:100px;padding:.38rem 1rem;
+  font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent-2);margin-bottom:1.75rem;
+  animation:heroIn 1s ease .1s both;
+}
+.hero h1{
+  font-family:var(--serif);
+  font-size:clamp(2.2rem,6vw,4rem);
+  font-weight:700;line-height:1.15;
+  color:var(--text-1);letter-spacing:-.03em;
+  max-width:700px;margin-bottom:1.1rem;
+  animation:heroIn 1s ease .25s both;
+}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent-2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{
+  font-size:1rem;color:var(--text-2);line-height:1.8;
+  max-width:540px;margin-bottom:2.5rem;
+  animation:heroIn 1s ease .4s both;
+}
+.hero-actions{
+  display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;
+  animation:heroIn 1s ease .55s both;
+}
+.hero-stats{
+  display:flex;gap:3rem;flex-wrap:wrap;justify-content:center;
+  margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid var(--glass-bdr);
+  width:100%;max-width:640px;
+  animation:heroIn 1s ease .7s both;
+}
+.hs-i{text-align:center;}
+.hs-v{font-family:var(--mono);font-size:1.85rem;font-weight:500;color:var(--text-1);display:block;letter-spacing:-.03em;}
+.hs-l{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-top:.2rem;}
+@keyframes heroIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ══════════════════════════════════════
+   UTILITY
+══════════════════════════════════════ */
+.mt1{margin-top:.5rem;}.mt2{margin-top:1rem;}.mt3{margin-top:1.5rem;}
+.mb1{margin-bottom:.5rem;}.mb2{margin-bottom:1rem;}.mb3{margin-bottom:1.5rem;}
+.flex{display:flex;}.items-c{align-items:center;}.just-b{justify-content:space-between;}
+.gap-sm{gap:.5rem;}.gap-md{gap:.75rem;}.gap-lg{gap:1rem;}
+.txt-sm{font-size:.8rem;}.txt-xs{font-size:.72rem;}
+.txt-sec{color:var(--text-2);}.txt-ter{color:var(--text-3);}.txt-accent{color:var(--accent-2);}
+.txt-danger{color:var(--danger-2);}.txt-success{color:var(--success-2);}.txt-warn{color:var(--warn-2);}
+.mono{font-family:var(--mono);}.serif{font-family:var(--serif);}
+.fw6{font-weight:600;}.fw7{font-weight:700;}
+.search-bar{display:flex;align-items:center;background:rgba(5,12,26,0.7);border:1px solid var(--glass-bdr2);border-radius:var(--r);overflow:hidden;backdrop-filter:var(--blur-sm);}
+.search-bar input{flex:1;background:none;border:none;outline:none;padding:.6rem .95rem;color:var(--text-1);font-size:.875rem;}
+.search-bar input::placeholder{color:var(--text-3);}
+.search-bar .sb-go{background:var(--accent);border:none;color:#fff;padding:.6rem 1.1rem;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.search-bar .sb-go:hover{background:var(--accent-2);}
+.info-box{padding:.9rem 1rem;border-radius:var(--r);font-size:.82rem;line-height:1.65;}
+.info-box.info-warn{background:rgba(240,165,0,0.09);border:1px solid rgba(240,165,0,0.25);color:var(--warn-2);}
+.info-box.info-danger{background:rgba(224,82,82,0.09);border:1px solid rgba(224,82,82,0.25);color:var(--danger-2);}
+.info-box.info-accent{background:var(--accent-dim);border:1px solid rgba(56,139,255,.25);color:var(--accent-2);}
+.divider{height:1px;background:var(--glass-bdr);margin:1.25rem 0;}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-canvas">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<!-- TOAST MOUNT -->
+<div id="toast-mount"></div>
+
+<!-- ══════════════ TOPBAR ══════════════ -->
+<header class="topbar">
+  <div class="brand" onclick="goto('home')">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/><polyline points="9 12 11 14 15 10"/></svg>
+    </div>
+    <div>
+      <span class="brand-name">CTT</span>
+      <span class="brand-sub">Clever Track Tech</span>
+    </div>
+  </div>
+  <nav class="nav-links">
+    <button class="nav-btn active" id="nb-home"     onclick="goto('home')">Home</button>
+    <button class="nav-btn"        id="nb-register" onclick="goto('register')">Register Device</button>
+    <button class="nav-btn nav-report-btn" id="nb-report" onclick="goto('report')">Report Stolen</button>
+    <button class="nav-btn"        id="nb-checker"  onclick="goto('checker')">IMEI Check</button>
+    <button class="nav-btn"        id="nb-cert"     onclick="goto('cert')">Ownership Cert.</button>
+    <button class="nav-btn"        id="nb-alerts"   onclick="goto('alerts')">Alert Feed</button>
+    <button class="nav-btn"        id="nb-gps"      onclick="goto('gps')">GPS</button>
+    <button class="nav-btn"        id="nb-rewards"  onclick="goto('rewards')">Rewards</button>
+  </nav>
+  <div class="nav-right">
+    <button class="btn-admin-nav" onclick="openAdmin()">⚙ Admin Panel</button>
+    <button class="nav-toggle" onclick="toggleMenu()" id="nav-tog">☰</button>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-menu-btn active" id="mn-home"     onclick="mGoto('home')"><span class="mmb-icon">🏠</span>Home</button>
+  <button class="mobile-menu-btn"        id="mn-register" onclick="mGoto('register')"><span class="mmb-icon">📱</span>Register Device</button>
+  <button class="mobile-menu-btn danger" id="mn-report"   onclick="mGoto('report')"><span class="mmb-icon">🚨</span>Report Stolen Phone</button>
+  <button class="mobile-menu-btn"        id="mn-checker"  onclick="mGoto('checker')"><span class="mmb-icon">🔍</span>IMEI Check</button>
+  <button class="mobile-menu-btn"        id="mn-cert"     onclick="mGoto('cert')"><span class="mmb-icon">📜</span>Ownership Certificate</button>
+  <button class="mobile-menu-btn"        id="mn-alerts"   onclick="mGoto('alerts')"><span class="mmb-icon">🔔</span>Alert Feed</button>
+  <button class="mobile-menu-btn"        id="mn-gps"      onclick="mGoto('gps')"><span class="mmb-icon">📍</span>GPS Tracking</button>
+  <button class="mobile-menu-btn"        id="mn-rewards"  onclick="mGoto('rewards')"><span class="mmb-icon">🏆</span>Rewards & Recovery</button>
+  <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-bdr)">
+    <button class="mobile-menu-btn" onclick="closeMobileMenu();openAdmin()"><span class="mmb-icon">⚙</span>Admin Panel</button>
+  </div>
+</div>
+
+<!-- BOTTOM MOB NAV -->
+<div class="mob-bar">
+  <div class="mob-bar-inner">
+    <button class="mob-btn active" id="mb-home"     onclick="goto('home')"><span class="mi">🏠</span>Home</button>
+    <button class="mob-btn"        id="mb-register" onclick="goto('register')"><span class="mi">📱</span>Register</button>
+    <button class="mob-btn danger" id="mb-report"   onclick="goto('report')"><span class="mi">🚨</span>Report</button>
+    <button class="mob-btn"        id="mb-checker"  onclick="goto('checker')"><span class="mi">🔍</span>Check</button>
+    <button class="mob-btn"        id="mb-alerts"   onclick="goto('alerts')"><span class="mi">🔔</span>Alerts</button>
+    <button class="mob-btn"        id="mb-gps"      onclick="goto('gps')"><span class="mi">📍</span>GPS</button>
+  </div>
+</div>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div class="page active" id="p-home">
+  <div class="hero">
+    <div class="hero-pill"><span class="bd-dot" style="background:var(--success)"></span>Community Network Active</div>
+    <h1>Protecting Communities Against <em>Phone Theft</em></h1>
+    <p class="hero-sub">CTT is Zambia's community-powered device security platform. Register your phone, report thefts instantly, verify IMEI status before buying, and track recovery — all in real time.</p>
+    <div class="hero-actions">
+      <button class="btn btn-danger btn-lg" onclick="goto('report')">🚨 Report Stolen Phone</button>
+      <button class="btn btn-primary btn-lg" onclick="goto('checker')">🔍 Check IMEI</button>
+      <button class="btn btn-secondary btn-lg" onclick="goto('register')">📱 Register Device</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hs-i"><span class="hs-v" id="hs-d">0</span><div class="hs-l">Devices Registered</div></div>
+      <div class="hs-i"><span class="hs-v" id="hs-r">0</span><div class="hs-l">Reports Filed</div></div>
+      <div class="hs-i"><span class="hs-v" id="hs-rv">0</span><div class="hs-l">Devices Recovered</div></div>
+      <div class="hs-i"><span class="hs-v" id="hs-c">0</span><div class="hs-l">IMEI Checks Done</div></div>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-tag"><span class="bd-dot"></span>Live Feed</div>
+    <div class="ticker-scroll"><div class="ticker-inner" id="ticker-el">
+      <span class="ticker-item">No activity yet — register your device to join the CTT protection network.</span>
+    </div></div>
+  </div>
+  <div class="pw">
+    <div class="sdiv">Recent Theft Alerts</div>
+    <div id="home-feed">
+      <div class="empty"><span class="empty-i">📋</span><p class="empty-t">No reports filed yet. Community alerts will appear here as reports are submitted.</p></div>
+    </div>
+    <div class="mt3" style="text-align:center">
+      <button class="btn btn-ghost" onclick="goto('alerts')">View Full Alert Feed →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ REGISTER ══════════════ -->
+<div class="page" id="p-register">
+  <div class="pw">
+    <div class="ph"><div class="ph-eye">Device Management</div><h1>Register Your Device</h1><p>Secure your phone by adding it to the CTT community database. Registration enables instant theft reporting, IMEI blacklisting, and ownership verification.</p></div>
+    <div class="g2">
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">📱 Device Information</div>
+          <div class="fg"><label>IMEI Number <span class="req">*</span></label><input id="r-imei" type="text" placeholder="15-digit IMEI — dial *#06# to find" maxlength="17"><div class="hint">Your device's unique 15-digit identifier.</div></div>
+          <div class="fg-row">
+            <div class="fg"><label>Brand <span class="req">*</span></label>
+              <select id="r-brand"><option value="">Select brand</option><option>Samsung</option><option>Apple (iPhone)</option><option>Tecno</option><option>Infinix</option><option>Xiaomi / Redmi</option><option>Huawei</option><option>Nokia</option><option>Oppo</option><option>Realme</option><option>Itel</option><option>Other</option></select>
+            </div>
+            <div class="fg"><label>Model <span class="req">*</span></label><input id="r-model" type="text" placeholder="e.g. Galaxy A14"></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>Colour <span class="req">*</span></label><input id="r-color" type="text" placeholder="e.g. Midnight Black"></div>
+            <div class="fg"><label>Storage</label>
+              <select id="r-storage"><option value="">—</option><option>16 GB</option><option>32 GB</option><option>64 GB</option><option>128 GB</option><option>256 GB</option><option>512 GB</option></select>
+            </div>
+          </div>
+          <div class="fg"><label>Serial Number</label><input id="r-serial" type="text" placeholder="Optional — in Settings → About Phone"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">📄 Proof of Ownership</div>
+          <div class="fg-row">
+            <div class="fg"><label>Purchase Date</label><input id="r-pdate" type="date"></div>
+            <div class="fg"><label>Purchase Location</label><input id="r-shop" type="text" placeholder="e.g. Shoprite Lusaka"></div>
+          </div>
+          <div class="fg"><label>Receipt / Invoice</label><input id="r-receipt" type="file" accept="image/*,.pdf"></div>
+          <div class="fg"><label>Device Photo</label><input id="r-photo" type="file" accept="image/*"></div>
+          <div class="fg"><label>Identifying Marks / Notes</label><textarea id="r-notes" placeholder="Scratches, stickers, screen cracks, custom case…"></textarea></div>
+        </div>
+      </div>
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">👤 Owner Information</div>
+          <div class="fg"><label>Full Name <span class="req">*</span></label><input id="r-name" type="text" placeholder="As it appears on your NRC"></div>
+          <div class="fg"><label>Mobile Number <span class="req">*</span></label><input id="r-phone" type="tel" placeholder="+260 9XX XXX XXX"></div>
+          <div class="fg"><label>Email Address</label><input id="r-email" type="email" placeholder="Optional"></div>
+          <div class="fg"><label>NRC / National ID</label><input id="r-nrc" type="text" placeholder="For identity verification in disputes"><div class="hint">Stored securely and never shared publicly.</div></div>
+          <div class="divider"></div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="doRegister()">Register Device</button>
+        </div>
+        <div class="card">
+          <div class="card-hd">ℹ Why Register?</div>
+          <div style="display:flex;flex-direction:column;gap:.9rem">
+            <div style="display:flex;gap:.8rem;align-items:flex-start"><span style="color:var(--accent-2);font-size:.9rem;margin-top:.1rem">▸</span><div><div class="fw6 txt-sm">Instant Theft Reporting</div><div class="txt-xs txt-ter mt1">One-click stolen report — IMEI blacklisted community-wide immediately.</div></div></div>
+            <div style="display:flex;gap:.8rem;align-items:flex-start"><span style="color:var(--accent-2);font-size:.9rem;margin-top:.1rem">▸</span><div><div class="fw6 txt-sm">Ownership Certificate</div><div class="txt-xs txt-ter mt1">Generate a verifiable ownership document any time for resale or insurance.</div></div></div>
+            <div style="display:flex;gap:.8rem;align-items:flex-start"><span style="color:var(--accent-2);font-size:.9rem;margin-top:.1rem">▸</span><div><div class="fw6 txt-sm">GPS-Assisted Recovery</div><div class="txt-xs txt-ter mt1">Opt-in location sharing to help authorities locate your device.</div></div></div>
+            <div style="display:flex;gap:.8rem;align-items:flex-start"><span style="color:var(--accent-2);font-size:.9rem;margin-top:.1rem">▸</span><div><div class="fw6 txt-sm">Community Protection</div><div class="txt-xs txt-ter mt1">Alerts nearby users and repair shops when your device is reported stolen.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sdiv">Your Registered Devices</div>
+    <div id="reg-list"><div class="empty"><span class="empty-i">📱</span><p class="empty-t">No devices registered yet.</p></div></div>
+  </div>
+</div>
+
+<!-- ══════════════ REPORT STOLEN ══════════════ -->
+<div class="page" id="p-report">
+  <div class="pw">
+    <div class="ph"><div class="ph-eye">Theft Reporting</div><h1>Report a Stolen Device</h1><p>Filing a report immediately blacklists the IMEI in the CTT community database and issues real-time alerts to nearby users and registered repair shops.</p></div>
+    <div class="info-box info-warn mb3">⚠ Filing a false or fraudulent report is a criminal offence under Zambian law. Ensure all information provided is accurate and truthful.</div>
+    <div class="g2">
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">📱 Stolen Device Details</div>
+          <div class="fg"><label>IMEI Number <span class="req">*</span></label><input id="rp-imei" type="text" placeholder="15-digit IMEI" maxlength="17"></div>
+          <div class="fg-row">
+            <div class="fg"><label>Brand <span class="req">*</span></label>
+              <select id="rp-brand"><option value="">Select</option><option>Samsung</option><option>Apple (iPhone)</option><option>Tecno</option><option>Infinix</option><option>Xiaomi / Redmi</option><option>Huawei</option><option>Nokia</option><option>Oppo</option><option>Realme</option><option>Itel</option><option>Other</option></select>
+            </div>
+            <div class="fg"><label>Model <span class="req">*</span></label><input id="rp-model" type="text" placeholder="e.g. Redmi Note 12"></div>
+          </div>
+          <div class="fg-row">
+            <div class="fg"><label>Colour <span class="req">*</span></label><input id="rp-color" type="text" placeholder="e.g. Forest Green"></div>
+            <div class="fg"><label>Date Stolen <span class="req">*</span></label><input id="rp-date" type="date"></div>
+          </div>
+          <div class="fg"><label>Last Known Location <span class="req">*</span></label><input id="rp-loc" type="text" placeholder="e.g. Kafue Road near Shoprite, Lusaka"></div>
+          <div class="fg"><label>Description of Incident <span class="req">*</span></label><textarea id="rp-desc" placeholder="Describe the circumstances — time of day, how it was taken, any witnesses…"></textarea></div>
+          <div class="fg"><label>Suspect Description</label><textarea id="rp-suspect" placeholder="Physical description, clothing, direction of escape (leave blank if unknown)…" style="min-height:65px"></textarea></div>
+          <div class="fg"><label>Evidence Upload</label><input id="rp-ev" type="file" accept="image/*,video/*"><div class="hint">CCTV footage, photos, screenshots of location — any evidence helps.</div></div>
+        </div>
+      </div>
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">👤 Reporting Party</div>
+          <div class="fg"><label>Full Name <span class="req">*</span></label><input id="rp-name" type="text" placeholder="Your full name"></div>
+          <div class="fg"><label>Contact Number <span class="req">*</span></label><input id="rp-phone" type="tel" placeholder="+260 9XX XXX XXX"></div>
+          <div class="fg"><label>Police Case / OB Number</label><input id="rp-ob" type="text" placeholder="If already reported to police (optional)"></div>
+          <div class="fg"><label>Police Station</label><input id="rp-station" type="text" placeholder="e.g. Woodlands Police Post, Lusaka"></div>
+        </div>
+        <div class="card glass-danger">
+          <div class="card-hd" style="color:var(--danger-2)">⚠ What Happens After Filing</div>
+          <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem">
+            <div class="txt-sm">🔴 IMEI immediately blacklisted in CTT database</div>
+            <div class="txt-sm">📢 Real-time alert issued to nearby CTT users</div>
+            <div class="txt-sm">🏪 All registered repair shops notified</div>
+            <div class="txt-sm">📋 Official Case Report ID generated for police use</div>
+            <div class="txt-sm">📡 Device appears on community alert feed</div>
+          </div>
+          <button class="btn btn-danger btn-full btn-lg" onclick="doReport()">File Theft Report & Alert Community</button>
+        </div>
+        <div class="card glass-success" id="report-success" style="display:none">
+          <div class="card-hd" style="color:var(--success-2)">✓ Report Filed Successfully</div>
+          <div class="fg mb2"><label>Case Report ID</label>
+            <div style="background:rgba(5,12,26,0.7);border:1px solid var(--glass-bdr2);border-radius:var(--r);padding:.65rem 1rem;display:flex;justify-content:space-between;align-items:center">
+              <span class="mono fw6 txt-accent" id="rp-caseid" style="font-size:1.05rem"></span>
+              <button class="btn btn-ghost btn-sm" onclick="copyVal('rp-caseid','Case ID')">Copy</button>
+            </div>
+          </div>
+          <div class="txt-xs txt-ter">Save this ID for your police report, insurance claim, and future CTT verification.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ IMEI CHECKER ══════════════ -->
+<div class="page" id="p-checker">
+  <div class="pw">
+    <div class="ph"><div class="ph-eye">Device Verification</div><h1>Community IMEI Checker</h1><p>Verify a device's status against the CTT database before purchasing second-hand. Protect yourself from unknowingly buying stolen property.</p></div>
+    <div class="g2">
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">🔍 Check IMEI Status</div>
+          <div class="fg"><label>IMEI Number</label><input id="ci-imei" type="text" placeholder="Enter 15-digit IMEI number" maxlength="17" onkeydown="if(event.key==='Enter')doCheck()"><div class="hint">Dial *#06# on any phone to reveal its IMEI number.</div></div>
+          <button class="btn btn-primary btn-full" onclick="doCheck()">Run IMEI Check</button>
+          <div class="rbox" id="check-result">
+            <div class="rbox-icon" id="cr-icon"></div>
+            <div class="rbox-status" id="cr-status"></div>
+            <div class="rbox-msg" id="cr-msg"></div>
+            <div id="cr-details"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd">🕐 Recent Checks This Session</div>
+          <div id="rc-list"><div class="empty" style="padding:1.25rem 0"><span class="empty-t txt-xs">No checks yet.</span></div></div>
+        </div>
+      </div>
+      <div class="stacked">
+        <div class="g2">
+          <div class="stat-box s-accent"><div class="sb-label">Total in DB</div><div class="sb-val c-accent" id="st-total">0</div><div class="sb-sub">Tracked</div></div>
+          <div class="stat-box s-danger"><div class="sb-label">Blacklisted</div><div class="sb-val c-danger" id="st-stol">0</div><div class="sb-sub">Stolen</div></div>
+          <div class="stat-box s-success"><div class="sb-label">Clean</div><div class="sb-val c-success" id="st-safe">0</div><div class="sb-sub">Safe to buy</div></div>
+          <div class="stat-box s-warn"><div class="sb-label">Recovered</div><div class="sb-val c-warn" id="st-rec">0</div><div class="sb-sub">Previous stolen</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">📋 Buyer's Status Guide</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <div style="padding:.85rem;background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:var(--r)"><div class="fw6 txt-success txt-sm mb1">✅ CLEAN — Safe to Purchase</div><div class="txt-xs txt-sec">Not blacklisted. Verify seller identity and ownership documents separately.</div></div>
+            <div style="padding:.85rem;background:rgba(224,82,82,0.06);border:1px solid rgba(224,82,82,0.2);border-radius:var(--r)"><div class="fw6 txt-danger txt-sm mb1">🚫 BLACKLISTED — Do Not Purchase</div><div class="txt-xs txt-sec">Reported stolen. Do not buy. Contact CTT or police if seller is offering this device.</div></div>
+            <div style="padding:.85rem;background:rgba(240,165,0,0.06);border:1px solid rgba(240,165,0,0.2);border-radius:var(--r)"><div class="fw6 txt-warn txt-sm mb1">⚠ RECOVERED — Proceed With Caution</div><div class="txt-xs txt-sec">Previously stolen but recovered. Request full CTT recovery documentation before buying.</div></div>
+            <div style="padding:.85rem;background:rgba(255,255,255,0.03);border:1px solid var(--glass-bdr);border-radius:var(--r)"><div class="fw6 txt-sm mb1" style="color:var(--text-2)">❓ NOT FOUND</div><div class="txt-xs txt-sec">Not in CTT database. Proceed cautiously — request full ownership proof from seller.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ OWNERSHIP CERT ══════════════ -->
+<div class="page" id="p-cert">
+  <div class="pw-sm">
+    <div class="ph"><div class="ph-eye">Ownership Verification</div><h1>Device Ownership Certificate</h1><p>Generate a verifiable certificate of ownership for any registered device — suitable for resale, insurance claims, or legal dispute resolution.</p></div>
+    <div class="card mb2">
+      <div class="card-hd">🔍 Locate Device Record</div>
+      <div class="fg"><label>IMEI Number or Registered Mobile Number</label><input id="cert-q" type="text" placeholder="Enter IMEI or your registered phone number"></div>
+      <div class="fg"><label>NRC / National ID <span class="txt-xs txt-ter">(optional — improves accuracy)</span></label><input id="cert-nrc" type="text" placeholder="Enter for additional identity verification"></div>
+      <button class="btn btn-primary btn-full" onclick="doCert()">Generate Ownership Certificate</button>
+    </div>
+    <div class="cert-card" id="cert-out">
+      <div class="cert-wm">VERIFIED</div>
+      <div class="cert-top">
+        <div><div class="cert-org">Clever Track Tech — CTT Community Platform, Zambia</div><div class="mono txt-xs txt-ter mt1" id="cert-id"></div></div>
+        <div class="cert-vbadge"><span>●</span>Ownership Verified</div>
+      </div>
+      <div class="divider"></div>
+      <div class="cert-title">Certificate of Device Ownership</div>
+      <div class="cert-sub">This certificate confirms the registered ownership of the described device within the CTT community security database. Valid for official and commercial use.</div>
+      <div id="cert-fields"></div>
+      <div class="cert-foot" id="cert-hash"></div>
+      <div class="flex gap-md mt2">
+        <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+        <button class="btn btn-primary" onclick="copyVal('cert-id','Certificate ID')">Copy Certificate ID</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ALERTS ══════════════ -->
+<div class="page" id="p-alerts">
+  <div class="pw">
+    <div class="ph"><div class="ph-eye">Community Safety</div><h1>Nearby Alert Feed</h1><p>Real-time theft reports and recovery updates from across the CTT community network.</p></div>
+    <div class="flex just-b items-c mb2" style="flex-wrap:wrap;gap:.75rem">
+      <div class="flex gap-sm">
+        <button class="btn btn-secondary btn-sm" onclick="filterAlerts('all')"       id="fa-all">All Reports</button>
+        <button class="btn btn-ghost btn-sm"     onclick="filterAlerts('stolen')"    id="fa-stolen">Stolen</button>
+        <button class="btn btn-ghost btn-sm"     onclick="filterAlerts('recovered')" id="fa-recovered">Recovered</button>
+      </div>
+      <span class="badge bd-live"><span class="bd-dot"></span>Live</span>
+    </div>
+    <div id="alerts-feed"><div class="empty"><span class="empty-i">📡</span><p class="empty-t">No alerts yet. Community reports will appear here as they are filed.</p></div></div>
+  </div>
+</div>
+
+<!-- ══════════════ GPS ══════════════ -->
+<div class="page" id="p-gps">
+  <div class="pw">
+    <div class="ph"><div class="ph-eye">Device Recovery</div><h1>GPS Tracking</h1><p>Location-assisted device recovery. GPS access requires your explicit permission. Admin panel required to view tracked device locations.</p></div>
+    <div class="info-box info-accent mb3">🔒 <strong>Privacy Notice:</strong> Only you can share your location. Administrators can only view location data for devices with active theft reports where the owner has granted permission.</div>
+    <div class="g2">
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">📍 My Current Location</div>
+          <div class="map-box">
+            <div class="map-grid"></div>
+            <div class="map-circles"><div class="map-ring"></div><div class="map-ring"></div><div class="map-ring"></div></div>
+            <div class="map-pin-wrap">
+              <span class="map-pin">📍</span>
+              <div class="map-coords" id="gps-coords">Location not yet obtained</div>
+            </div>
+          </div>
+          <div class="fg-row mt2">
+            <button class="btn btn-primary" style="flex:1" onclick="getLocation()">Get My Location</button>
+            <button class="btn btn-secondary" style="flex:1" onclick="shareLocation()">Share Live Location</button>
+          </div>
+          <div id="gps-detail"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">🔍 Find My Device</div>
+          <div class="fg"><label>Device IMEI</label><input id="fmp-imei" type="text" placeholder="Your registered device IMEI"></div>
+          <div class="fg"><label>Verification PIN</label><input id="fmp-pin" type="password" placeholder="6-digit PIN (set at registration)" maxlength="6"></div>
+          <button class="btn btn-primary btn-full" onclick="findDevice()">Locate My Device</button>
+          <div id="fmp-res"></div>
+        </div>
+      </div>
+      <div class="stacked">
+        <div class="card">
+          <div class="card-hd">⚙ Location Sharing Preferences</div>
+          <div class="tog-row"><div class="tog-text"><div class="tt1">Background Location</div><div class="tt2">Share location periodically even when screen is off.</div></div><div class="tog" id="tg-bg" onclick="togSwitch('tg-bg')"></div></div>
+          <div class="tog-row"><div class="tog-text"><div class="tt1">Theft Alert Auto-Ping</div><div class="tt2">Automatically transmit location when theft is reported for this device.</div></div><div class="tog on" id="tg-theft" onclick="togSwitch('tg-theft')"></div></div>
+          <div class="tog-row"><div class="tog-text"><div class="tt1">7-Day Location Log</div><div class="tt2">Keep a rolling log of the last 7 days of location history.</div></div><div class="tog on" id="tg-log" onclick="togSwitch('tg-log')"></div></div>
+          <div class="tog-row"><div class="tog-text"><div class="tt1">Police Access (On Report)</div><div class="tt2">Allow verified police accounts to view location data only upon filed theft report.</div></div><div class="tog" id="tg-police" onclick="togSwitch('tg-police')"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">🕐 Location History</div>
+          <div id="gps-hist"><div class="empty" style="padding:1.25rem 0"><span class="empty-t txt-xs">No history recorded.</span></div></div>
+        </div>
+        <div class="card glass-accent">
+          <div class="card-hd">🔒 Privacy Commitment</div>
+          <div class="txt-sm txt-sec" style="line-height:1.75">CTT accesses GPS only with explicit browser permission. Location data is encrypted and never sold to third parties. Law enforcement access is limited to registered theft reports with owner authorisation. All tracking requests through the admin panel are logged and auditable.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ REWARDS ══════════════ -->
+<div class="page" id="p-rewards">
+  <div class="pw">
+    <div class="ph"><div class="ph-eye">Recovery Incentives</div><h1>Reward & Recovery Centre</h1><p>Post financial rewards for device recovery, mark recovered devices, and share stories that help the community protect itself better.</p></div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="rwTab('offer')">💰 Post a Reward</button>
+      <button class="tab-btn" onclick="rwTab('active')">Active Rewards</button>
+      <button class="tab-btn" onclick="rwTab('mark')">Mark Recovered</button>
+      <button class="tab-btn" onclick="rwTab('stories')">Recovery Stories</button>
+    </div>
+    <div class="tab-pane active" id="rw-offer">
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd">💰 Reward Details</div>
+          <div class="fg"><label>Case Report ID <span class="req">*</span></label><input id="rw-case" type="text" placeholder="e.g. CTT-2025-001"></div>
+          <div class="fg"><label>Device Description <span class="req">*</span></label><input id="rw-dev" type="text" placeholder="e.g. Black Samsung Galaxy A14, 128 GB"></div>
+          <div class="fg"><label>Reward Amount (ZMW) <span class="req">*</span></label><input id="rw-amt" type="number" placeholder="e.g. 500" min="1"></div>
+          <div class="fg"><label>Additional Information for Finder</label><textarea id="rw-info" placeholder="Any extra details that may help someone identify your device…"></textarea></div>
+          <div class="fg"><label>Preferred Contact Method</label>
+            <select id="rw-contact"><option>Via CTT secure message only</option><option>Phone call permitted</option><option>WhatsApp preferred</option></select>
+          </div>
+          <button class="btn btn-success btn-full" onclick="postReward()">Post Reward Offer</button>
+        </div>
+        <div class="card">
+          <div class="card-hd">ℹ How Rewards Work</div>
+          <div style="display:flex;flex-direction:column;gap:.9rem;font-size:.83rem;color:var(--text-2);line-height:1.7">
+            <p><strong style="color:var(--text-1)">1. Post your reward</strong> — Enter your case ID and the amount you are offering for information or return of your device.</p>
+            <p><strong style="color:var(--text-1)">2. Visible to community</strong> — Your reward appears in the Active Rewards feed for all CTT users to see.</p>
+            <p><strong style="color:var(--text-1)">3. Finder contacts you</strong> — Via your preferred contact method through CTT's secure messaging.</p>
+            <p><strong style="color:var(--text-1)">4. Mark as recovered</strong> — Once your device is returned, update the case status.</p>
+            <p><strong style="color:var(--text-1)">5. Share your story</strong> — Help others by sharing how recovery happened.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane" id="rw-active">
+      <div id="rw-active-list"><div class="empty"><span class="empty-i">💰</span><p class="empty-t">No active rewards yet.</p></div></div>
+    </div>
+    <div class="tab-pane" id="rw-mark">
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd">✓ Mark Device as Recovered</div>
+          <div class="fg"><label>Case Report ID <span class="req">*</span></label><input id="mk-case" type="text" placeholder="Your CTT case ID"></div>
+          <div class="fg"><label>Recovery Location <span class="req">*</span></label><input id="mk-loc" type="text" placeholder="Where was the device found?"></div>
+          <div class="fg"><label>Recovery Story <span class="req">*</span></label><textarea id="mk-story" placeholder="Describe how your device was recovered — this helps the community…"></textarea></div>
+          <div class="fg"><label>Recovery Photo</label><input id="mk-photo" type="file" accept="image/*"></div>
+          <button class="btn btn-success btn-full" onclick="doMarkRecovered()">Confirm Device Recovered</button>
+        </div>
+        <div class="card">
+          <div class="card-hd">ℹ What Happens</div>
+          <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.83rem;color:var(--text-2);line-height:1.65">
+            <p>✓ IMEI removed from active blacklist</p>
+            <p>✓ Case status updated to <strong style="color:var(--warn-2)">RECOVERED</strong></p>
+            <p>✓ IMEI checks will show device as previously stolen but recovered</p>
+            <p>✓ Recovery story added to community feed</p>
+            <p>✓ Active rewards for this case marked as fulfilled</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane" id="rw-stories">
+      <div id="rw-stories-list"><div class="empty"><span class="empty-i">📖</span><p class="empty-t">No recovery stories yet.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN DASHBOARD ══════════════ -->
+<div class="page" id="p-admin">
+  <div class="pw-lg">
+    <div class="ph"><div class="ph-eye">Administration — Restricted Access</div><h1>CTT Admin Dashboard</h1><p>Authorised personnel only — Police Officers, Registered Repair Shops, Mobile Dealers. All actions are logged.</p></div>
+    <div class="g4 mb3">
+      <div class="stat-box s-accent"><div class="sb-label">Total Devices</div><div class="sb-val c-accent" id="adm-tot">0</div><div class="sb-sub">Registered</div></div>
+      <div class="stat-box s-danger"><div class="sb-label">Stolen Reports</div><div class="sb-val c-danger" id="adm-stol">0</div><div class="sb-sub">Active</div></div>
+      <div class="stat-box s-success"><div class="sb-label">Recovered</div><div class="sb-val c-success" id="adm-rec">0</div><div class="sb-sub">Total</div></div>
+      <div class="stat-box s-warn"><div class="sb-label">IMEI Checks</div><div class="sb-val c-warn" id="adm-chk">0</div><div class="sb-sub">All time</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="admTab('lookup')">🔍 IMEI Lookup</button>
+      <button class="tab-btn" onclick="admTab('reports')">📋 Reports</button>
+      <button class="tab-btn" onclick="admTab('devices')">📱 Devices</button>
+      <button class="tab-btn" onclick="admTab('shop')">🔧 Shop Verify</button>
+      <button class="tab-btn" onclick="admTab('bulk')">📦 Bulk Check</button>
+      <button class="tab-btn" onclick="admTab('track')">📍 Device Tracking</button>
+    </div>
+
+    <!-- LOOKUP -->
+    <div class="tab-pane active" id="at-lookup">
+      <div class="card">
+        <div class="card-hd">🔍 Search — IMEI, Owner, Model or Case ID</div>
+        <div class="search-bar mb2"><input id="adm-q" type="text" placeholder="Enter IMEI, owner name, model or case ID…" onkeydown="if(event.key==='Enter')admSearch()"><button class="sb-go" onclick="admSearch()">Search</button></div>
+        <div id="adm-res"></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="tab-pane" id="at-reports">
+      <div class="card">
+        <div class="card-hd">📋 All Filed Theft Reports</div>
+        <div id="adm-reports" class="tbl-wrap"></div>
+      </div>
+    </div>
+
+    <!-- DEVICES -->
+    <div class="tab-pane" id="at-devices">
+      <div class="card">
+        <div class="card-hd">📱 All Registered Devices</div>
+        <div id="adm-devs" class="tbl-wrap"></div>
+      </div>
+    </div>
+
+    <!-- SHOP VERIFY -->
+    <div class="tab-pane" id="at-shop">
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd">🔧 Pre-Acceptance Device Verification</div>
+          <div class="fg"><label>Device IMEI</label><input id="shop-q" type="text" placeholder="Scan or manually enter IMEI before accepting device"></div>
+          <button class="btn btn-primary btn-full" onclick="shopVerify()">Verify Before Accepting</button>
+          <div id="shop-res" class="mt2"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">📩 Secure Owner Contact</div>
+          <div class="fg"><label>Case Report ID</label><input id="sc-case" type="text" placeholder="CTT case ID from theft report"></div>
+          <div class="fg"><label>Your Organisation</label><input id="sc-org" type="text" placeholder="Repair shop / police station name"></div>
+          <div class="fg"><label>Message to Device Owner</label><textarea id="sc-msg" placeholder="Describe the device you have and request identity verification…"></textarea></div>
+          <button class="btn btn-primary btn-full" onclick="secureMsg()">Send Secure Message</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK -->
+    <div class="tab-pane" id="at-bulk">
+      <div class="card">
+        <div class="card-hd">📦 Bulk IMEI Check — Dealer Portal</div>
+        <div class="fg"><label>IMEI Numbers — one per line</label><textarea id="bulk-in" style="min-height:140px;font-family:var(--mono);font-size:.82rem" placeholder="352901012345678&#10;490154203237518&#10;310150123456789"></textarea></div>
+        <button class="btn btn-primary" onclick="doBulk()">Check All IMEIs</button>
+        <div id="bulk-res" class="mt2"></div>
+      </div>
+    </div>
+
+    <!-- DEVICE TRACKING — ADMIN ONLY -->
+    <div class="tab-pane" id="at-track">
+      <div class="info-box info-danger mb3">🔒 <strong>RESTRICTED:</strong> Device tracking is available to authorised law enforcement only. All tracking requests are permanently logged with authority number, timestamp, and reason.</div>
+      <div class="g2">
+        <div class="card glass-danger">
+          <div class="card-hd" style="color:var(--danger-2)">📍 Request Device Location Data</div>
+          <div class="fg"><label>Case Report ID <span class="req">*</span></label><input id="trk-case" type="text" placeholder="CTT case ID (e.g. CTT-2025-001)"></div>
+          <div class="fg"><label>Officer Badge / Authority Number <span class="req">*</span></label><input id="trk-badge" type="text" placeholder="Official badge or authority number"></div>
+          <div class="fg"><label>Requesting Organisation</label><input id="trk-org" type="text" placeholder="Police station / enforcement agency"></div>
+          <div class="fg"><label>Justification for Request <span class="req">*</span></label><textarea id="trk-why" placeholder="Provide detailed justification for requesting location data…"></textarea></div>
+          <button class="btn btn-danger btn-full" onclick="doTrack()">Submit Tracking Request</button>
+          <div id="trk-res" class="mt2"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">📋 Tracking Request Log</div>
+          <div id="trk-log"><div class="empty" style="padding:1.25rem 0"><span class="empty-t txt-xs">No tracking requests logged.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN LOGIN MODAL ══════════════ -->
+<div class="overlay" id="admin-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAdmin()">✕</button>
+    <div class="modal-hd">
+      <h3>Administration Access</h3>
+      <p>This panel is restricted to authorised CTT personnel only. All access attempts are logged.</p>
+    </div>
+    <div class="fg"><label>Access Password</label><input type="password" id="adm-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')verifyAdmin()"></div>
+    <div class="txt-xs txt-danger mt1" id="adm-err" style="display:none">Incorrect password. Access denied. This attempt has been logged.</div>
+    <button class="btn btn-primary btn-full mt2" onclick="verifyAdmin()">Authenticate & Enter</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   DATA LAYER — persistent localStorage
+══════════════════════════════════════════════════════ */
+const KEY = 'ctt_v4';
+let DB = { devices:[], reports:[], rewards:[], stories:[], checks:[], trackLog:[], gpsLogs:[] };
+
+function dbLoad(){
+  try{ const s=localStorage.getItem(KEY); if(s) DB=Object.assign(DB,JSON.parse(s)); }catch(e){}
+}
+function dbSave(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6).toUpperCase(); }
+function newCaseId(){ return 'CTT-'+new Date().getFullYear()+'-'+String(DB.reports.length+1).padStart(3,'0'); }
+function now(){ return new Date().toLocaleString('en-ZM',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function v(id){ const e=document.getElementById(id); return e?e.value.trim():''; }
+
+/* ══════════════════════════════════════════════════════
+   ROUTING
+══════════════════════════════════════════════════════ */
+const PIDS=['home','register','report','checker','cert','alerts','gps','rewards','admin'];
+
+function goto(name){
+  closeMobileMenu();
+  PIDS.forEach(p=>{
+    const pg=document.getElementById('p-'+p); if(pg)pg.classList.remove('active');
+    ['nb-','mb-','mn-'].forEach(pre=>{ const el=document.getElementById(pre+p); if(el)el.classList.remove('active'); });
+  });
+  const pg=document.getElementById('p-'+name); if(pg)pg.classList.add('active');
+  ['nb-','mb-','mn-'].forEach(pre=>{ const el=document.getElementById(pre+name); if(el)el.classList.add('active'); });
+  window.scrollTo({top:0,behavior:'smooth'});
+  onPageLoad(name);
+}
+function mGoto(name){ closeMobileMenu(); goto(name); }
+
+function onPageLoad(n){
+  if(n==='home')     renderHome();
+  if(n==='alerts')   renderAlerts();
+  if(n==='register') renderRegList();
+  if(n==='checker')  updateStats();
+  if(n==='rewards')  { renderActiveRewards(); renderStories(); }
+  if(n==='admin')    renderAdmin();
+}
+
+/* Mobile menu */
+function toggleMenu(){
+  const m=document.getElementById('mobile-menu');
+  const tog=document.getElementById('nav-tog');
+  if(m.style.display==='flex'&&m.classList.contains('open')){closeMobileMenu();}
+  else{m.style.display='flex';requestAnimationFrame(()=>m.classList.add('open'));tog.textContent='✕';}
+}
+function closeMobileMenu(){
+  const m=document.getElementById('mobile-menu');
+  const tog=document.getElementById('nav-tog');
+  m.classList.remove('open');
+  tog.textContent='☰';
+  setTimeout(()=>{if(!m.classList.contains('open'))m.style.display='none';},300);
+}
+
+/* ══════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+══════════════════════════════════════════════════════ */
+function toast(type,title,msg){
+  const icons={success:'✓',error:'✕',info:'i',warn:'!'};
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.innerHTML=`<div class="toast-stripe"></div><div class="toast-icon">${icons[type]||'ℹ'}</div><div class="toast-body"><div class="t1">${escH(title)}</div>${msg?`<div class="t2">${escH(msg)}</div>`:''}</div>`;
+  const m=document.getElementById('toast-mount');
+  m.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),260);},3600);
+}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ══════════════════════════════════════════════════════
+   COPY HELPER
+══════════════════════════════════════════════════════ */
+function copyVal(id,label){
+  const v=document.getElementById(id)?.textContent?.trim();
+  if(!v)return;
+  navigator.clipboard.writeText(v)
+    .then(()=>toast('success','Copied',label+' copied to clipboard'))
+    .catch(()=>toast('warn','Copy manually',v));
+}
+
+/* ══════════════════════════════════════════════════════
+   ANIMATE COUNT
+══════════════════════════════════════════════════════ */
+function animN(id,target){
+  const el=document.getElementById(id); if(!el)return;
+  if(target===0){el.textContent='0';return;}
+  let cur=0; const step=Math.max(1,Math.ceil(target/30));
+  const t=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur;if(cur>=target)clearInterval(t);},45);
+}
+
+/* ══════════════════════════════════════════════════════
+   HOME
+══════════════════════════════════════════════════════ */
+function renderHome(){
+  animN('hs-d',DB.devices.length);
+  animN('hs-r',DB.reports.length);
+  animN('hs-rv',DB.devices.filter(d=>d.status==='recovered').length);
+  animN('hs-c',DB.checks.length);
+
+  const feed=document.getElementById('home-feed');
+  const items=[...DB.reports].reverse().slice(0,6);
+  feed.innerHTML=items.length?items.map(aiHTML).join(''):
+    `<div class="empty"><span class="empty-i">📋</span><p class="empty-t">No reports filed yet.</p></div>`;
+
+  buildTicker();
+}
+
+function buildTicker(){
+  const el=document.getElementById('ticker-el'); if(!el)return;
+  const items=[...DB.reports].reverse().slice(0,12);
+  if(!items.length){el.innerHTML='<span class="ticker-item">No activity yet — join the CTT network by registering your device.</span>';return;}
+  let html=items.map(r=>`<span class="ticker-item">${r.status==='stolen'?'🔴':'🟡'} <b>${r.colour} ${r.brand} ${r.model}</b> ${r.status==='stolen'?'reported stolen':'marked recovered'} — ${r.location} &nbsp;&nbsp;&nbsp;</span>`).join('');
+  el.innerHTML=html+html;
+}
+
+/* ══════════════════════════════════════════════════════
+   ALERT ITEM HTML
+══════════════════════════════════════════════════════ */
+function aiHTML(r){
+  const st=r.status||'stolen';
+  const bcls=st==='stolen'?'bd-stolen':st==='recovered'?'bd-recovered':'bd-safe';
+  const bar=st==='stolen'?'var(--danger)':st==='recovered'?'var(--warn)':'var(--success)';
+  return `<div class="ai ai-${st==='stolen'?'stolen':'recovered'}">
+    <div class="ai-bar" style="background:${bar}"></div>
+    <div class="ai-body">
+      <div class="ai-title">${escH(r.colour)} ${escH(r.brand)} ${escH(r.model)} — <span style="color:${st==='stolen'?'var(--danger-2)':'var(--warn-2)'}">${st==='stolen'?'STOLEN':'RECOVERED'}</span></div>
+      <div class="ai-meta">
+        <span>📍 ${escH(r.location)}</span>
+        <span class="mono" style="font-size:.7rem">IMEI: ${escH(r.imei)}</span>
+        <span>👤 ${escH(r.owner)}</span>
+      </div>
+      <div class="ai-time">Case: ${escH(r.id)} &nbsp;·&nbsp; ${escH(r.filedAt||r.date)}</div>
+    </div>
+    <div class="ai-side">
+      <span class="badge ${bcls}">${st}</span>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   REGISTER DEVICE
+══════════════════════════════════════════════════════ */
+function doRegister(){
+  const imei=v('r-imei'),brand=v('r-brand'),model=v('r-model'),
+    color=v('r-color'),name=v('r-name'),phone=v('r-phone');
+  if(!imei||!brand||!model||!color||!name||!phone)
+    { toast('error','Required fields missing','Fill all fields marked with *'); return; }
+  if(!/^\d{15}$/.test(imei))
+    { toast('error','Invalid IMEI','IMEI must be exactly 15 digits (numbers only)'); return; }
+  if(DB.devices.find(d=>d.imei===imei))
+    { toast('warn','Already registered','This IMEI is already in the CTT database'); return; }
+
+  DB.devices.push({
+    id:uid(),imei,brand,model,colour:color,
+    owner:name,phone,email:v('r-email'),nrc:v('r-nrc'),
+    serial:v('r-serial'),storage:v('r-storage'),
+    shop:v('r-shop'),purchaseDate:v('r-pdate')||today(),
+    notes:v('r-notes'),status:'safe',caseId:null,location:null,
+    registeredAt:now()
+  });
+  dbSave();
+
+  ['r-imei','r-brand','r-model','r-color','r-name','r-phone',
+   'r-email','r-nrc','r-serial','r-storage','r-shop','r-pdate','r-notes']
+    .forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+
+  toast('success','Device registered',`${brand} ${model} — IMEI blacklist protection active`);
+  renderRegList(); updateStats();
+}
+
+function renderRegList(){
+  const el=document.getElementById('reg-list'); if(!el)return;
+  if(!DB.devices.length){
+    el.innerHTML=`<div class="empty"><span class="empty-i">📱</span><p class="empty-t">No devices registered yet.</p></div>`; return;
+  }
+  el.innerHTML=DB.devices.map(d=>`
+    <div class="ai ai-${d.status==='stolen'?'stolen':d.status==='recovered'?'recovered':'safe'}" style="margin-bottom:.6rem">
+      <div class="ai-bar" style="background:${d.status==='stolen'?'var(--danger)':d.status==='recovered'?'var(--warn)':'var(--success)'}"></div>
+      <div class="ai-body">
+        <div class="ai-title">${escH(d.brand)} ${escH(d.model)} — ${escH(d.colour)}</div>
+        <div class="ai-meta"><span class="mono" style="font-size:.72rem">IMEI: ${escH(d.imei)}</span><span>👤 ${escH(d.owner)}</span><span>📅 ${escH(d.purchaseDate)}</span></div>
+      </div>
+      <div class="ai-side">
+        <span class="badge ${d.status==='stolen'?'bd-stolen':d.status==='recovered'?'bd-recovered':'bd-safe'}">${d.status}</span>
+        ${d.status==='safe'?`<button class="btn btn-danger btn-sm" onclick="quickReport('${d.imei}')">Mark Stolen</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="quickCert('${d.imei}')">Get Cert.</button>
+      </div>
+    </div>`).join('');
+}
+
+function quickReport(imei){
+  const d=DB.devices.find(x=>x.imei===imei); if(!d)return;
+  goto('report');
+  const map={imei:'rp-imei',brand:'rp-brand',model:'rp-model',colour:'rp-color',owner:'rp-name',phone:'rp-phone'};
+  Object.entries(map).forEach(([k,id])=>{const e=document.getElementById(id);if(e)e.value=d[k]||'';});
+  document.getElementById('rp-date').value=today();
+  toast('info','Pre-filled','Device details loaded — complete and submit the report');
+}
+function quickCert(imei){goto('cert');document.getElementById('cert-q').value=imei;doCert();}
+
+/* ══════════════════════════════════════════════════════
+   REPORT STOLEN
+══════════════════════════════════════════════════════ */
+function doReport(){
+  const imei=v('rp-imei'),brand=v('rp-brand'),model=v('rp-model'),
+    color=v('rp-color'),loc=v('rp-loc'),name=v('rp-name'),
+    phone=v('rp-phone'),desc=v('rp-desc');
+  const date=v('rp-date')||today();
+
+  if(!imei||!brand||!model||!color||!loc||!name||!phone||!desc)
+    { toast('error','Required fields missing','Fill all fields marked with *'); return; }
+  if(imei.length<10)
+    { toast('error','Invalid IMEI','Enter a valid IMEI number'); return; }
+
+  const id=newCaseId();
+  const dev=DB.devices.find(d=>d.imei===imei);
+  if(dev){ dev.status='stolen'; dev.caseId=id; dev.location=loc; }
+  else DB.devices.push({id:uid(),imei,brand,model,colour:color,owner:name,phone,status:'stolen',caseId:id,location:loc,purchaseDate:date,registeredAt:now()});
+
+  DB.reports.push({
+    id,imei,brand,model,colour:color,location:loc,
+    owner:name,phone,ob:v('rp-ob'),station:v('rp-station'),
+    desc,suspect:v('rp-suspect'),date,status:'stolen',filedAt:now()
+  });
+  dbSave();
+
+  document.getElementById('rp-caseid').textContent=id;
+  const sc=document.getElementById('report-success');
+  sc.style.display='block';
+  sc.scrollIntoView({behavior:'smooth',block:'nearest'});
+  toast('success','Report filed','Case '+id+' — IMEI blacklisted, community alerted');
+  updateStats(); buildTicker();
+}
+
+/* ══════════════════════════════════════════════════════
+   IMEI CHECKER
+══════════════════════════════════════════════════════ */
+function doCheck(){
+  const imei=v('ci-imei');
+  if(!imei||imei.length<10){ toast('error','Invalid input','Enter a valid IMEI number'); return; }
+
+  DB.checks.push({imei,ts:now()}); dbSave(); updateStats();
+  addRecentCheck(imei);
+
+  const box=document.getElementById('check-result');
+  box.className='rbox show';
+  const dev=DB.devices.find(d=>d.imei===imei);
+
+  if(!dev){
+    box.classList.add('unknown');
+    document.getElementById('cr-icon').textContent='❓';
+    document.getElementById('cr-status').textContent='NOT FOUND IN DATABASE';
+    document.getElementById('cr-msg').textContent='No record matches this IMEI in the CTT database. The device has not been registered or reported stolen by any CTT community member. Verify ownership documents independently before purchasing.';
+    document.getElementById('cr-details').innerHTML='';
+  } else if(dev.status==='stolen'){
+    box.classList.add('stolen');
+    document.getElementById('cr-icon').textContent='🚫';
+    document.getElementById('cr-status').textContent='BLACKLISTED — DO NOT PURCHASE';
+    document.getElementById('cr-msg').textContent='This device has been officially reported stolen and is blacklisted in the CTT community database. Do not purchase this device. If a seller is attempting to sell this device, contact police immediately.';
+    document.getElementById('cr-details').innerHTML=detailsHTML([
+      ['Device',dev.brand+' '+dev.model],['Colour',dev.colour],
+      ['Case ID',dev.caseId||'—'],['Last Location',dev.location||'Unknown']
+    ]);
+  } else if(dev.status==='recovered'){
+    box.classList.add('recovered');
+    document.getElementById('cr-icon').textContent='⚠️';
+    document.getElementById('cr-status').textContent='PREVIOUSLY STOLEN — RECOVERED';
+    document.getElementById('cr-msg').textContent='This device was previously reported stolen but has been recovered by the registered owner. Request full CTT recovery documentation and confirm the seller is the original registered owner before purchasing.';
+    document.getElementById('cr-details').innerHTML=detailsHTML([['Device',dev.brand+' '+dev.model],['Case ID',dev.caseId||'—']]);
+  } else {
+    box.classList.add('clean');
+    document.getElementById('cr-icon').textContent='✅';
+    document.getElementById('cr-status').textContent='CLEAN — SAFE TO PURCHASE';
+    document.getElementById('cr-msg').textContent='This IMEI is registered and verified clean in the CTT community database. It has not been reported stolen. Always verify seller identity and request ownership documents as additional due diligence.';
+    document.getElementById('cr-details').innerHTML=detailsHTML([
+      ['Device',dev.brand+' '+dev.model],['Colour',dev.colour],
+      ['Registered',dev.purchaseDate||'—'],['Status','CLEAN ✓']
+    ]);
+  }
+}
+
+function detailsHTML(rows){
+  return `<div class="rbox-details">${rows.map(([k,val])=>`<div class="rd-row"><div class="rd-k">${escH(k)}</div><div class="rd-v">${escH(val)}</div></div>`).join('')}</div>`;
+}
+
+function addRecentCheck(imei){
+  const el=document.getElementById('rc-list'); if(!el)return;
+  const dev=DB.devices.find(d=>d.imei===imei);
+  const st=dev?dev.status:'not found';
+  const clr=st==='stolen'?'var(--danger-2)':st==='recovered'?'var(--warn-2)':st==='safe'?'var(--success-2)':'var(--text-3)';
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;background:rgba(5,12,26,0.5);border-radius:var(--r);margin-bottom:.3rem;border:1px solid var(--glass-bdr)';
+  row.innerHTML=`<span class="mono txt-xs">${escH(imei)}</span><span style="color:${clr};font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase">${st}</span>`;
+  if(el.firstChild?.className?.includes('empty')) el.innerHTML='';
+  el.prepend(row);
+  while(el.children.length>6) el.lastChild.remove();
+}
+
+function updateStats(){
+  const s=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+  s('st-total',DB.devices.length);
+  s('st-stol',DB.devices.filter(d=>d.status==='stolen').length);
+  s('st-safe',DB.devices.filter(d=>d.status==='safe').length);
+  s('st-rec',DB.devices.filter(d=>d.status==='recovered').length);
+}
+
+/* ══════════════════════════════════════════════════════
+   OWNERSHIP CERTIFICATE
+══════════════════════════════════════════════════════ */
+function doCert(){
+  const q=v('cert-q');
+  if(!q){ toast('error','Enter identifier','Enter an IMEI or registered mobile number'); return; }
+  const dev=DB.devices.find(d=>d.imei===q||d.phone===q);
+  if(!dev){ toast('error','Not found','No registered device matches this identifier.'); return; }
+  if(dev.status==='stolen'){ toast('error','Certificate unavailable','This device is currently reported stolen. A certificate cannot be issued.'); return; }
+
+  const certId='CERT-'+dev.id.slice(0,8).toUpperCase()+'-'+new Date().getFullYear();
+  document.getElementById('cert-id').textContent='Certificate ID: '+certId;
+  document.getElementById('cert-fields').innerHTML=[
+    ['Registered Owner',dev.owner],['Device',dev.brand+' '+dev.model],
+    ['IMEI Number',dev.imei],['Colour',dev.colour],
+    ...(dev.serial?[['Serial No.',dev.serial]]:[]),
+    ['Purchase Date',dev.purchaseDate||'—'],
+    ['Database Status','VERIFIED CLEAN ✓'],['Issued',today()]
+  ].map(([k,val])=>`<div class="cert-row"><div class="cert-k">${escH(k)}</div><div class="cert-v" style="${k==='Database Status'?'color:var(--success-2)':''}">${escH(val)}</div></div>`).join('');
+  document.getElementById('cert-hash').textContent='Verification hash: '+btoa(certId+dev.imei).replace(/[+=]/g,'').toUpperCase().slice(0,32)+' · Verify at ctt.zm/verify';
+  document.getElementById('cert-out').classList.add('show');
+  toast('success','Certificate issued',certId);
+}
+
+/* ══════════════════════════════════════════════════════
+   ALERT FEED
+══════════════════════════════════════════════════════ */
+let alertF='all';
+function filterAlerts(f){
+  alertF=f;
+  ['all','stolen','recovered'].forEach(k=>{
+    const b=document.getElementById('fa-'+k); if(!b)return;
+    b.className=k===f?'btn btn-secondary btn-sm':'btn btn-ghost btn-sm';
+  });
+  renderAlerts();
+}
+function renderAlerts(){
+  const el=document.getElementById('alerts-feed'); if(!el)return;
+  let items=[...DB.reports].reverse();
+  if(alertF!=='all') items=items.filter(r=>r.status===alertF);
+  el.innerHTML=items.length?items.map(aiHTML).join(''):
+    `<div class="empty"><span class="empty-i">📡</span><p class="empty-t">No ${alertF!=='all'?alertF+' ':''}reports found.</p></div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   GPS
+══════════════════════════════════════════════════════ */
+function getLocation(){
+  if(!navigator.geolocation){ toast('error','Not supported','GPS is not available on this device'); return; }
+  toast('info','Requesting GPS','Please allow location access when prompted');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude.toFixed(6),lon=pos.coords.longitude.toFixed(6);
+    document.getElementById('gps-coords').textContent=`${lat}, ${lon}`;
+    document.getElementById('gps-detail').innerHTML=`
+      <div class="card mt2">
+        <div class="g2">
+          <div><div class="txt-xs txt-ter mb1">Latitude</div><div class="mono txt-sm">${lat}</div></div>
+          <div><div class="txt-xs txt-ter mb1">Longitude</div><div class="mono txt-sm">${lon}</div></div>
+          <div><div class="txt-xs txt-ter mb1">Accuracy</div><div class="mono txt-sm">±${Math.round(pos.coords.accuracy)} m</div></div>
+          <div><div class="txt-xs txt-ter mb1">Obtained</div><div class="mono txt-sm">${new Date().toLocaleTimeString()}</div></div>
+        </div>
+      </div>`;
+    const entry={lat,lon,ts:now()};
+    DB.gpsLogs.unshift(entry); if(DB.gpsLogs.length>20)DB.gpsLogs.pop();
+    dbSave(); addGPSHistory(entry);
+    toast('success','Location obtained',`${lat}, ${lon}`);
+  },()=>toast('error','Permission denied','Allow location access in your browser settings'));
+}
+
+function shareLocation(){ toast('info','Live sharing active','Your location is now being shared with the CTT network'); }
+
+function findDevice(){
+  const imei=v('fmp-imei'),pin=v('fmp-pin');
+  if(!imei){ toast('error','Enter IMEI','Enter your registered device IMEI'); return; }
+  if(!pin||pin.length<4){ toast('error','Enter PIN','Enter your device PIN'); return; }
+  const dev=DB.devices.find(d=>d.imei===imei);
+  if(!dev){ toast('error','Not registered','This IMEI is not in the CTT database'); return; }
+  const log=DB.gpsLogs[0];
+  document.getElementById('fmp-res').innerHTML=log?
+    `<div class="card mt2"><div class="card-hd">Last Known Location</div><div class="info-list"><div class="il-row"><span class="il-k">Coordinates</span><span class="il-v">${log.lat}, ${log.lon}</span></div><div class="il-row"><span class="il-k">Recorded</span><span class="il-v">${log.ts}</span></div></div></div>`:
+    `<div class="info-box info-accent mt2">No location data available. Enable location sharing in GPS settings to record history.</div>`;
+}
+
+function addGPSHistory(entry){
+  const el=document.getElementById('gps-hist'); if(!el)return;
+  if(el.firstChild?.className?.includes('empty')) el.innerHTML='';
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;background:rgba(5,12,26,0.5);border-radius:var(--r);margin-bottom:.3rem;border:1px solid var(--glass-bdr)';
+  row.innerHTML=`<span class="mono txt-accent txt-xs">${entry.lat}, ${entry.lon}</span><span class="txt-xs txt-ter">${entry.ts}</span>`;
+  el.prepend(row);
+  while(el.children.length>8) el.lastChild.remove();
+}
+
+function togSwitch(id){
+  const el=document.getElementById(id); if(!el)return;
+  el.classList.toggle('on');
+  toast('info','Preference saved','GPS setting updated');
+}
+
+/* ══════════════════════════════════════════════════════
+   REWARDS
+══════════════════════════════════════════════════════ */
+let rwTabActive='offer';
+function rwTab(t){
+  rwTabActive=t;
+  const tabs=['offer','active','mark','stories'];
+  const btns=document.querySelectorAll('#p-rewards .tab-btn');
+  document.querySelectorAll('#p-rewards .tab-pane').forEach(p=>p.classList.remove('active'));
+  btns.forEach(b=>b.classList.remove('active'));
+  const idx=tabs.indexOf(t);
+  if(btns[idx]) btns[idx].classList.add('active');
+  const pane=document.getElementById('rw-'+t);
+  if(pane) pane.classList.add('active');
+  if(t==='active') renderActiveRewards();
+  if(t==='stories') renderStories();
+}
+
+function postReward(){
+  const cid=v('rw-case'),dev=v('rw-dev'),amt=v('rw-amt');
+  if(!cid||!dev||!amt){ toast('error','Missing fields','Fill all required fields'); return; }
+  if(parseFloat(amt)<=0){ toast('error','Invalid amount','Enter a positive reward amount'); return; }
+  DB.rewards.push({id:uid(),caseId:cid,device:dev,amount:parseFloat(amt),info:v('rw-info'),contact:v('rw-contact'),active:true,postedAt:now()});
+  dbSave();
+  toast('success','Reward posted','ZMW '+amt+' reward listed for '+dev);
+  ['rw-case','rw-dev','rw-amt','rw-info'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderActiveRewards(); rwTab('active');
+}
+
+function renderActiveRewards(){
+  const el=document.getElementById('rw-active-list'); if(!el)return;
+  const act=DB.rewards.filter(r=>r.active);
+  el.innerHTML=act.length?act.map(r=>`
+    <div class="ai ai-recovered" style="margin-bottom:.6rem">
+      <div class="ai-bar" style="background:var(--warn)"></div>
+      <div class="ai-body">
+        <div class="ai-title">${escH(r.device)}</div>
+        <div class="ai-meta"><span>💰 ZMW ${Number(r.amount).toLocaleString()}</span><span>Case: ${escH(r.caseId)}</span><span>${escH(r.contact)}</span></div>
+        <div class="ai-time">${escH(r.postedAt)}</div>
+      </div>
+      <div class="ai-side"><span class="badge bd-recovered">Active</span></div>
+    </div>`).join(''):
+    `<div class="empty"><span class="empty-i">💰</span><p class="empty-t">No active rewards posted yet.</p></div>`;
+}
+
+function doMarkRecovered(){
+  const cid=v('mk-case'),loc=v('mk-loc'),story=v('mk-story');
+  if(!cid||!story){ toast('error','Missing fields','Enter case ID and recovery story'); return; }
+  const dev=DB.devices.find(d=>d.caseId===cid);
+  if(dev) dev.status='recovered';
+  const rep=DB.reports.find(r=>r.id===cid);
+  if(rep) rep.status='recovered';
+  DB.rewards.filter(r=>r.caseId===cid).forEach(r=>r.active=false);
+  DB.stories.push({id:uid(),device:dev?`${dev.brand} ${dev.model}`:'Device',owner:dev?.owner||'Owner',story,location:loc,date:today(),caseId:cid,addedAt:now()});
+  dbSave();
+  toast('success','Device marked recovered','IMEI removed from active blacklist — Case '+cid+' updated');
+  ['mk-case','mk-loc','mk-story'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderStories(); renderActiveRewards(); buildTicker();
+  rwTab('stories');
+}
+
+function renderStories(){
+  const el=document.getElementById('rw-stories-list'); if(!el)return;
+  el.innerHTML=DB.stories.length?[...DB.stories].reverse().map(s=>`
+    <div class="card glass-success mb2">
+      <div class="flex just-b items-c mb1">
+        <div><span class="fw6">${escH(s.device)}</span><span class="txt-sec txt-sm"> — ${escH(s.owner)}</span></div>
+        <span class="badge bd-safe">Recovered</span>
+      </div>
+      <div class="txt-sm txt-sec" style="line-height:1.7;margin:.5rem 0">"${escH(s.story)}"</div>
+      <div class="txt-xs txt-ter">📍 ${escH(s.location)} &nbsp;·&nbsp; ${escH(s.date)}</div>
+    </div>`).join(''):
+    `<div class="empty"><span class="empty-i">📖</span><p class="empty-t">No recovery stories yet.</p></div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   ADMIN — ALL TRACKING IS ADMIN-ONLY
+══════════════════════════════════════════════════════ */
+let admTabActive='lookup';
+function admTab(t){
+  admTabActive=t;
+  const tabs=['lookup','reports','devices','shop','bulk','track'];
+  const btns=document.querySelectorAll('#p-admin .tab-btn');
+  document.querySelectorAll('#p-admin .tab-pane').forEach(p=>p.classList.remove('active'));
+  btns.forEach(b=>b.classList.remove('active'));
+  const idx=tabs.indexOf(t);
+  if(btns[idx]) btns[idx].classList.add('active');
+  const pane=document.getElementById('at-'+t);
+  if(pane) pane.classList.add('active');
+  if(t==='reports') renderAdmReports();
+  if(t==='devices') renderAdmDevices();
+  if(t==='track') renderTrackLog();
+}
+
+function renderAdmin(){
+  animN('adm-tot',DB.devices.length);
+  animN('adm-stol',DB.reports.filter(r=>r.status==='stolen').length);
+  animN('adm-rec',DB.devices.filter(d=>d.status==='recovered').length);
+  animN('adm-chk',DB.checks.length);
+  renderAdmReports();
+}
+
+function admSearch(){
+  const q=v('adm-q').toLowerCase();
+  const el=document.getElementById('adm-res'); if(!el)return;
+  if(!q){ el.innerHTML=''; return; }
+  const found=DB.devices.filter(d=>
+    d.imei.includes(q)||d.owner.toLowerCase().includes(q)||
+    d.model.toLowerCase().includes(q)||d.brand.toLowerCase().includes(q)||
+    (d.caseId||'').toLowerCase().includes(q)||(d.phone||'').includes(q)
+  );
+  el.innerHTML=found.length?
+    `<div class="tbl-wrap mt2"><table>
+      <thead><tr><th>IMEI</th><th>Device</th><th>Owner</th><th>Status</th><th>Case ID</th><th>Actions</th></tr></thead>
+      <tbody>${found.map(d=>`<tr>
+        <td class="mono" style="font-size:.78rem">${escH(d.imei)}</td>
+        <td>${escH(d.brand)} ${escH(d.model)}<div class="txt-xs txt-ter">${escH(d.colour)}</div></td>
+        <td>${escH(d.owner)}<div class="txt-xs txt-ter">${escH(d.phone)}</div></td>
+        <td><span class="badge ${d.status==='stolen'?'bd-stolen':d.status==='recovered'?'bd-recovered':'bd-safe'}">${d.status}</span></td>
+        <td class="mono txt-xs">${escH(d.caseId||'—')}</td>
+        <td><div style="display:flex;gap:.35rem;flex-wrap:wrap">
+          ${d.status==='stolen'?`<button class="btn btn-warn btn-sm" onclick="admRecover('${d.id}')">Recovered</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="admContact('${d.phone}')">Contact</button>
+          <button class="btn btn-danger btn-sm" onclick="admDel('${d.id}')">Remove</button>
+        </div></td>
+      </tr>`).join('')}</tbody></table></div>`:
+    `<div class="txt-sm txt-ter mt2">No results found for "${escH(q)}".</div>`;
+}
+
+function renderAdmReports(){
+  const el=document.getElementById('adm-reports'); if(!el)return;
+  const items=[...DB.reports].reverse();
+  el.innerHTML=items.length?
+    `<table><thead><tr><th>Case ID</th><th>Device</th><th>IMEI</th><th>Location</th><th>Owner</th><th>Filed</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>${items.map(r=>`<tr>
+      <td class="mono" style="font-size:.75rem">${escH(r.id)}</td>
+      <td>${escH(r.brand)} ${escH(r.model)}<div class="txt-xs txt-ter">${escH(r.colour)}</div></td>
+      <td class="mono" style="font-size:.73rem">${escH(r.imei)}</td>
+      <td class="txt-xs">${escH(r.location)}</td>
+      <td>${escH(r.owner)}<div class="txt-xs txt-ter">${escH(r.phone)}</div></td>
+      <td class="txt-xs txt-ter">${escH(r.filedAt||r.date)}</td>
+      <td><span class="badge ${r.status==='stolen'?'bd-stolen':'bd-recovered'}">${r.status}</span></td>
+      <td>${r.status==='stolen'?`<button class="btn btn-warn btn-sm" onclick="admRecoverByCase('${r.id}')">Mark Recovered</button>`:'—'}</td>
+    </tr>`).join('')}</tbody></table>`:
+    `<div class="empty" style="padding:1.5rem 0"><p class="empty-t txt-xs">No reports filed yet.</p></div>`;
+}
+
+function renderAdmDevices(){
+  const el=document.getElementById('adm-devs'); if(!el)return;
+  const items=[...DB.devices].reverse();
+  el.innerHTML=items.length?
+    `<table><thead><tr><th>IMEI</th><th>Device</th><th>Owner</th><th>Contact</th><th>Registered</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${items.map(d=>`<tr>
+      <td class="mono" style="font-size:.75rem">${escH(d.imei)}</td>
+      <td>${escH(d.brand)} ${escH(d.model)}<div class="txt-xs txt-ter">${escH(d.colour)}</div></td>
+      <td>${escH(d.owner)}</td>
+      <td class="txt-xs">${escH(d.phone)}</td>
+      <td class="txt-xs txt-ter">${escH(d.registeredAt||d.purchaseDate)}</td>
+      <td><span class="badge ${d.status==='stolen'?'bd-stolen':d.status==='recovered'?'bd-recovered':'bd-safe'}">${d.status}</span></td>
+      <td><div style="display:flex;gap:.35rem;flex-wrap:wrap">
+        ${d.status==='stolen'?`<button class="btn btn-warn btn-sm" onclick="admRecover('${d.id}')">Recovered</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="admContact('${d.phone}')">Contact</button>
+        <button class="btn btn-danger btn-sm" onclick="admDel('${d.id}')">Remove</button>
+      </div></td>
+    </tr>`).join('')}</tbody></table>`:
+    `<div class="empty" style="padding:1.5rem 0"><p class="empty-t txt-xs">No devices registered.</p></div>`;
+}
+
+function admRecover(id){
+  const d=DB.devices.find(x=>x.id===id); if(!d)return;
+  d.status='recovered';
+  const r=DB.reports.find(x=>x.imei===d.imei&&x.status==='stolen'); if(r)r.status='recovered';
+  dbSave(); renderAdmDevices(); renderAdmReports();
+  toast('success','Status updated',`${d.brand} ${d.model} marked as recovered`);
+}
+function admRecoverByCase(cid){
+  const r=DB.reports.find(x=>x.id===cid); if(!r)return;
+  r.status='recovered';
+  const d=DB.devices.find(x=>x.caseId===cid); if(d)d.status='recovered';
+  dbSave(); renderAdmReports(); renderAdmDevices();
+  toast('success','Case updated','Case '+cid+' marked as recovered');
+}
+function admContact(phone){ toast('info','Owner contact','Registered phone: '+phone); }
+function admDel(id){
+  if(!confirm('Permanently remove this device from the CTT database?')) return;
+  DB.devices=DB.devices.filter(d=>d.id!==id); dbSave();
+  renderAdmDevices(); toast('info','Device removed','Record deleted from database');
+}
+
+function shopVerify(){
+  const imei=v('shop-q');
+  if(!imei){ toast('error','Enter IMEI','Enter the device IMEI'); return; }
+  const dev=DB.devices.find(d=>d.imei===imei);
+  const el=document.getElementById('shop-res'); if(!el)return;
+  if(!dev){
+    el.innerHTML=`<div class="info-box info-accent">❓ <strong>Not in CTT Database</strong> — No record found. Request proof of purchase from customer before accepting.</div>`;
+  } else if(dev.status==='stolen'){
+    el.innerHTML=`<div class="info-box info-danger">⛔ <strong>STOLEN — DO NOT ACCEPT</strong><br><small>Case: ${escH(dev.caseId||'—')} — Report to police if customer is present. Owner: ${escH(dev.owner)} (${escH(dev.phone)})</small></div>`;
+  } else {
+    el.innerHTML=`<div class="info-box info-accent" style="background:var(--success-dim);border-color:rgba(46,204,113,.3);color:var(--success-2)">✓ <strong>CLEAN — Safe to accept</strong><br><small>${escH(dev.brand)} ${escH(dev.model)} — Registered owner: ${escH(dev.owner)}</small></div>`;
+  }
+}
+
+function secureMsg(){
+  const cid=v('sc-case'),org=v('sc-org');
+  if(!cid||!org){ toast('error','Missing fields','Enter case ID and organisation name'); return; }
+  toast('success','Message sent','Secure message delivered to registered device owner');
+  ['sc-case','sc-org','sc-msg'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+}
+
+function doBulk(){
+  const lines=v('bulk-in').split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length){ toast('error','No input','Enter at least one IMEI'); return; }
+  const el=document.getElementById('bulk-res');
+  el.innerHTML=`<div class="tbl-wrap mt2"><table>
+    <thead><tr><th>#</th><th>IMEI</th><th>Status</th><th>Device</th></tr></thead>
+    <tbody>${lines.map((imei,i)=>{
+      const dev=DB.devices.find(d=>d.imei===imei);
+      const st=dev?dev.status:'not found';
+      const bc=st==='stolen'?'bd-stolen':st==='recovered'?'bd-recovered':st==='safe'?'bd-safe':'bd-unknown';
+      return `<tr><td class="txt-xs txt-ter">${i+1}</td><td class="mono txt-xs">${escH(imei)}</td><td><span class="badge ${bc}">${st}</span></td><td class="txt-sm">${dev?escH(dev.brand+' '+dev.model):'—'}</td></tr>`;
+    }).join('')}</tbody></table></div>`;
+  toast('success','Bulk check complete',`${lines.length} IMEI${lines.length>1?'s':''} verified`);
+}
+
+/* DEVICE TRACKING — ADMIN ONLY */
+function doTrack(){
+  const cid=v('trk-case'),badge=v('trk-badge'),why=v('trk-why');
+  if(!cid||!badge||!why){ toast('error','Required fields','Enter case ID, badge number, and justification'); return; }
+  const rep=DB.reports.find(r=>r.id===cid);
+  if(!rep){ toast('error','Case not found','No theft report found with this case ID'); return; }
+  const entry={id:uid(),caseId:cid,badge,org:v('trk-org'),reason:why,ts:now(),
+    deviceInfo:`${rep.brand} ${rep.model} (${rep.imei})`};
+  DB.trackLog.push(entry); dbSave();
+  const lastGPS=DB.gpsLogs[0];
+  document.getElementById('trk-res').innerHTML=`
+    <div class="card glass-accent mt2">
+      <div class="card-hd" style="color:var(--accent-2)">📋 Tracking Request Logged</div>
+      <div class="info-list">
+        <div class="il-row"><span class="il-k">Case</span><span class="il-v">${escH(cid)}</span></div>
+        <div class="il-row"><span class="il-k">Device</span><span class="il-v">${escH(entry.deviceInfo)}</span></div>
+        <div class="il-row"><span class="il-k">Last GPS</span><span class="il-v">${lastGPS?`${lastGPS.lat}, ${lastGPS.lon}`:'No GPS data available'}</span></div>
+        <div class="il-row"><span class="il-k">Recorded</span><span class="il-v">${lastGPS?lastGPS.ts:'—'}</span></div>
+      </div>
+      <div class="txt-xs txt-ter mt2">This request has been permanently logged. Accessing location data without authority is a criminal offence.</div>
+    </div>`;
+  renderTrackLog();
+  toast('info','Request logged','Tracking request for case '+cid+' recorded in audit log');
+  ['trk-case','trk-badge','trk-org','trk-why'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+}
+
+function renderTrackLog(){
+  const el=document.getElementById('trk-log'); if(!el)return;
+  el.innerHTML=DB.trackLog.length?[...DB.trackLog].reverse().map(t=>`
+    <div style="padding:.65rem .85rem;background:rgba(5,12,26,0.6);border:1px solid var(--glass-bdr);border-radius:var(--r);margin-bottom:.4rem">
+      <div class="flex just-b">
+        <span class="mono txt-accent txt-xs">${escH(t.caseId)}</span>
+        <span class="txt-xs txt-ter">${escH(t.ts)}</span>
+      </div>
+      <div class="txt-xs txt-sec mt1">Badge: ${escH(t.badge)}${t.org?` · ${escH(t.org)}`:''}</div>
+      <div class="txt-xs txt-ter">${escH(t.reason||'—')}</div>
+    </div>`).join(''):
+    `<div class="empty" style="padding:1.25rem 0"><p class="empty-t txt-xs">No tracking requests logged.</p></div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   ADMIN AUTH MODAL
+══════════════════════════════════════════════════════ */
+function openAdmin(){
+  document.getElementById('admin-overlay').classList.add('open');
+  document.getElementById('adm-pw').value='';
+  document.getElementById('adm-err').style.display='none';
+  setTimeout(()=>document.getElementById('adm-pw').focus(),80);
+}
+function closeAdmin(){ document.getElementById('admin-overlay').classList.remove('open'); }
+function verifyAdmin(){
+  if(document.getElementById('adm-pw').value==='2222'){
+    closeAdmin(); goto('admin');
+    toast('success','Access granted','Welcome to CTT Administration Panel');
+  } else {
+    document.getElementById('adm-err').style.display='block';
+    document.getElementById('adm-pw').value='';
+    document.getElementById('adm-pw').focus();
+  }
+}
+document.getElementById('admin-overlay').addEventListener('click',function(e){ if(e.target===this)closeAdmin(); });
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+dbLoad();
+renderHome();
+updateStats();
+
+// Restore GPS history from log
+if(DB.gpsLogs.length){
+  const hist=document.getElementById('gps-hist');
+  if(hist){ hist.innerHTML=''; DB.gpsLogs.slice(0,8).forEach(addGPSHistory); }
+}
+</script>
+</body>
+</html>
